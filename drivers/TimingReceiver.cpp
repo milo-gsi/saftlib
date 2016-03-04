@@ -19,6 +19,7 @@
 #include "Output.h"
 #include "Inoutput.h"
 #include "Input.h"
+#include "Display.h"
 
 namespace saftlib {
 
@@ -670,8 +671,12 @@ void TimingReceiver::probe(OpenDevice& od)
   };
   Glib::RefPtr<TimingReceiver> tr = RegisteredObject<TimingReceiver>::create(od.objectPath, args);
   od.ref = tr;
-    
+  
+  /* Register IOs */
   InoutImpl::probe(tr.operator->(), tr->actionSinks);
+  
+  /* Register displays */
+  Display::probe(tr.operator->(), tr->otherStuff);
   
   // Add special SCU hardware
   if (scubus.size() == 1) {
