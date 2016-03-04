@@ -32,6 +32,11 @@ namespace saftlib
       static Glib::RefPtr<Display> create(const Glib::ustring& objectPath, ConstructorType args);
       static int probe(TimingReceiver* tr, std::map< Glib::ustring,std::map< Glib::ustring, Glib::RefPtr<Owned> > > &otherStuff);
       
+      guint32 PutStringToLocation(const Glib::ustring& string, guint32 row, guint32 col);
+      
+      guint32 getNumberOfRows() const;
+      guint32 getNumberOfColumns() const;
+      
     /* Private */
     /* ==================================================================================================== */
     private:
@@ -44,6 +49,9 @@ namespace saftlib
       
       TimingReceiver* dev;
       eb_address_t display_addr;
+      
+      unsigned rows;
+      unsigned columns;
   };
 
 } /* namespace saftlib */

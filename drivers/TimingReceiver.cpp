@@ -678,6 +678,8 @@ void TimingReceiver::probe(OpenDevice& od)
   /* Register displays */
   Display::probe(tr.operator->(), tr->otherStuff);
   
+  clog << kLogDebug << od.objectPath << std::endl; 
+  
   // Add special SCU hardware
   if (scubus.size() == 1) {
     // !!! hard-coded to #3
