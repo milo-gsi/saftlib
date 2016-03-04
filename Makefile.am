@@ -37,6 +37,7 @@ saftd_SOURCES = version.h \
 	drivers/Output.cpp		drivers/Output.h		\
 	drivers/Input.cpp		drivers/Input.h			\
 	drivers/Inoutput.cpp		drivers/Inoutput.h		\
+	drivers/Display.cpp		drivers/Display.h		\
 	drivers/TimingReceiver.cpp	drivers/TimingReceiver.h	\
 	src/globals.cpp			src/main.cpp
 saftd_LDADD = $(EB_LIBS) $(GIOMM_LIBS) interfaces/libsaftlib.la

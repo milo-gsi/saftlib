@@ -11,6 +11,7 @@ NODES =				\
 	SCUbusCondition.xml	\
 	SoftwareActionSink.xml	\
 	SoftwareCondition.xml	\
+	Display.xml	\
 	TimingReceiver.xml
 INTERFACES =			\
 	ActionSink.xml		\
@@ -50,6 +51,7 @@ nodist_saftlib_HEADERS = 	\
 	iSCUbusCondition.h	\
 	iSoftwareActionSink.h	\
 	iSoftwareCondition.h	\
+	iDisplay.h	\
 	iTimingReceiver.h	\
 	MILbusActionSink.h	\
 	MILbusCondition.h	\
@@ -59,6 +61,7 @@ nodist_saftlib_HEADERS = 	\
 	SCUbusCondition.h	\
 	SoftwareActionSink.h	\
 	SoftwareCondition.h	\
+	Display.h	\
 	TimingReceiver.h
 
 if INTERFACE_DOCS
@@ -79,6 +82,7 @@ doc_DATA = 			\
 	SCUbusCondition.pdf	\
 	SoftwareActionSink.pdf	\
 	SoftwareCondition.pdf	\
+	Display.pdf	\
 	TimingReceiver.pdf
 endif
 
@@ -105,6 +109,7 @@ nodist_libsaftlib_la_SOURCES =	\
 	iSCUbusCondition.cpp	\
 	iSoftwareActionSink.cpp	\
 	iSoftwareCondition.cpp	\
+	iDisplay.cpp	\
 	iTimingReceiver.cpp	\
 	MILbusActionSink.cpp	\
 	MILbusCondition.cpp	\
@@ -114,6 +119,7 @@ nodist_libsaftlib_la_SOURCES =	\
 	SCUbusCondition.cpp	\
 	SoftwareActionSink.cpp	\
 	SoftwareCondition.cpp	\
+	Display.cpp	\
 	TimingReceiver.cpp
 
 $(doc_DATA:.pdf=.doc-xml) $(nodist_libsaftlib_la_SOURCES) $(nodist_saftlib_HEADERS):	$(NODES) $(INTERFACES) $(XSL)
