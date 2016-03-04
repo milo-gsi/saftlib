@@ -1,0 +1,33 @@
+<node xmlns:xi="http://www.w3.org/2001/XInclude" name="Display">
+  <annotation name="de.gsi.saftlib.name" value="de.gsi.saftlib"/>
+  
+  <!-- Include base interfaces -->
+  <xi:include href="Owned.xml"/>
+  
+  <!-- de.gsi.saftlib.Display:
+      @short_description: TBD
+   -->
+  <interface name="de.gsi.saftlib.Display">
+    
+    <!-- PutStringToLocation: Description -->
+    <method name="PutStringToLocation">
+      <arg direction="in" type="s" name="string"/>
+      <arg direction="in" type="u" name="row"/>
+      <arg direction="in" type="u" name="col"/>
+    </method>
+    
+    <!-- NumberOfRows: Description -->
+    <property name="NumberOfRows" type="u" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/>
+    </property>
+    
+    <!-- NumberOfColumns: Description -->
+    <property name="NumberOfColumns" type="u" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/>
+    </property>
+    
+  </interface>
+</node>
+
+
+
