@@ -14,6 +14,7 @@
 #include "SAFTd.h"
 #include "clog.h"
 #include "build.h"
+#include "drivers/Dice.h"
 
 using namespace saftlib;
 
@@ -22,7 +23,7 @@ static bool am_daemon = false;
 void print_backtrace(std::ostream& stream, const char *where)
 {
   stream << where << ": ";
-  
+
   try {
     throw;
   } catch (const std::exception &ex) {
@@ -34,11 +35,11 @@ void print_backtrace(std::ostream& stream, const char *where)
   } catch(...) {
     stream << "unknown exception\n";
   }
-  
+
   void * array[50];
   int size = backtrace(array, sizeof(array)/sizeof(array[0]));
   char ** messages = backtrace_symbols(array, size);
-  
+
   if (messages) {
     stream << "Stack-trace:\n";
     for (int i = 1; i < size; ++i) { // Skip 0 = this function
@@ -61,7 +62,7 @@ void print_backtrace(std::ostream& stream, const char *where)
   } else {
     stream << "Unable to generate stack trace" << std::endl;
   }
-  
+
   abort();
 }
 
@@ -83,6 +84,7 @@ void on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, cons
 
 void on_name_acquired(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */, const Glib::ustring& /* name */, int argc, char** argv)
 {
+  std::cout << __FILE__ << __LINE__ << std::endl;
   for (int i = 1; i < argc; ++i) {
     // parse the string
     std::string command = argv[i];
@@ -91,18 +93,31 @@ void on_name_acquired(const Glib::RefPtr<Gio::DBus::Connection>& /* connection *
       std::cerr << "Argument '" << command << "' is not of form <logical-name>:<etherbone-path>" << std::endl;
       exit(1);
     }
-    
+std::cout << __FILE__ << __LINE__ << std::endl;
     std::string name = command.substr(0, pos);
     std::string path = command.substr(pos+1, std::string::npos);
-    
-    try {
-      SAFTd::get().AttachDevice(name, path);
-    } catch (...) {
-      print_backtrace(std::cerr, ("Attaching " + name + "(" + path + ")").c_str());
-      throw;
+std::cout << __FILE__ << __LINE__ << std::endl;
+    // separate
+    if (name=="dice")
+    {
+      Dice::ConstructorType args = { 6 };
+      std::cout << __FILE__ << __LINE__ << std::endl;
+      Glib::RefPtr<Dice> dice = Dice::create("/de/gsi/saftlib/" + name, args);
+      std::cout << __FILE__ << __LINE__ << std::endl;
+      SAFTd::get().AttachNonEtherboneDevice(name, dice);
+      std::cout << __FILE__ << __LINE__ << std::endl;
+    }
+    else
+    {
+      try {
+        SAFTd::get().AttachDevice(name, path);
+      } catch (...) {
+        print_backtrace(std::cerr, ("Attaching " + name + "(" + path + ")").c_str());
+        throw;
+      }
     }
   }
-  
+std::cout << "attached devices" << std::endl;
   // startup complete; detach from terminal
   int devnull_w = open("/dev/null", O_WRONLY);
   int devnull_r = open("/dev/null", O_RDONLY);
@@ -110,16 +125,16 @@ void on_name_acquired(const Glib::RefPtr<Gio::DBus::Connection>& /* connection *
     std::cerr << "failed to open /dev/null" << std::endl;
     exit (1);
   }
-  if (dup2(devnull_r, 0) == -1 || 
+  if (dup2(devnull_r, 0) == -1 ||
       dup2(devnull_w, 1) == -1 ||
       dup2(devnull_w, 2) == -1) {
     std::cerr << "failed to close stdin/stdout/stderr" << std::endl;
   }
   close(devnull_r);
   close(devnull_w);
-  
+
   am_daemon = true;
-  
+
   // log success
   clog << kLogNotice << "started" << std::endl;
   clog << kLogInfo << "sourceVersion: " << sourceVersion << std::endl;
@@ -144,13 +159,13 @@ int main(int argc, char** argv)
     std::cerr << "expecting at least one argument <logical-name>:<etherbone-path> ..." << std::endl;
     return 1;
   }
-  
+
   // Catch signals for clean shutdown
   signal(SIGINT,  &on_sigint);
   signal(SIGTERM, &on_sigint);
   signal(SIGQUIT, &on_sigint);
   signal(SIGHUP,  SIG_IGN);
-  
+
   // turn into a daemon
   switch (fork()) {
   case -1: std::cerr << "failed to fork" << std::endl; exit(1);
@@ -169,17 +184,17 @@ int main(int argc, char** argv)
   // initialize gio
   std::locale::global(std::locale(""));
   Gio::init();
-  
+
   // Connect to the dbus system daemon
   const guint id = Gio::DBus::own_name(Gio::DBus::BUS_TYPE_SYSTEM,
     "de.gsi.saftlib",
     sigc::ptr_fun(&on_bus_acquired),
     sigc::bind(sigc::bind(sigc::ptr_fun(&on_name_acquired), argv), argc),
     sigc::ptr_fun(&on_name_lost));
-  
+
   // Run the main event loop
   SAFTd::get().loop()->run();
-  
+
   // Cleanup
   Gio::DBus::unown_name(id);
 

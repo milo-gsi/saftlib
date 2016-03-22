@@ -1,7 +1,7 @@
 SUBDIRS = interfaces
 
 sbin_PROGRAMS = saftd
-bin_PROGRAMS = saft-ctl fg-ctl
+bin_PROGRAMS = saft-ctl fg-ctl dice-ctl
 noinst_PROGRAMS = client
 
 dbussystemdir = @sysconfdir@/dbus-1/system.d
@@ -39,6 +39,7 @@ saftd_SOURCES = version.h \
 	drivers/MILbusActionSink.cpp	drivers/MILbusActionSink.h	\
 	drivers/FunctionGenerator.cpp	drivers/FunctionGenerator.h	\
 	drivers/TimingReceiver.cpp	drivers/TimingReceiver.h	\
+	drivers/Dice.cpp	drivers/Dice.h	\
 	src/globals.cpp			src/main.cpp
 saftd_LDADD = $(EB_LIBS) $(GIOMM_LIBS) interfaces/libsaftlib.la
 saftd_LDFLAGS = -rdynamic # needed for stack trace
@@ -51,6 +52,10 @@ saft_ctl_LDADD   = $(GIOMM_LIBS) interfaces/libsaftlib.la
 
 fg_ctl_SOURCES = src/fg-ctl.cpp
 fg_ctl_LDADD   = $(GIOMM_LIBS) interfaces/libsaftlib.la
+
+dice_ctl_SOURCES = src/dice-ctl.cpp
+dice_ctl_LDADD   = $(GIOMM_LIBS) interfaces/libsaftlib.la
+
 
 if GIT_TREE
 version.h:

@@ -11,7 +11,8 @@ NODES =				\
 	SCUbusCondition.xml	\
 	SoftwareActionSink.xml	\
 	SoftwareCondition.xml	\
-	TimingReceiver.xml
+	TimingReceiver.xml \
+	Dice.xml
 INTERFACES =			\
 	ActionSink.xml		\
 	Condition.xml		\
@@ -59,7 +60,9 @@ nodist_saftlib_HEADERS = 	\
 	SCUbusCondition.h	\
 	SoftwareActionSink.h	\
 	SoftwareCondition.h	\
-	TimingReceiver.h
+	TimingReceiver.h \
+	Dice.h \
+	iDice.h
 
 if INTERFACE_DOCS
 doc_DATA = 			\
@@ -79,7 +82,8 @@ doc_DATA = 			\
 	SCUbusCondition.pdf	\
 	SoftwareActionSink.pdf	\
 	SoftwareCondition.pdf	\
-	TimingReceiver.pdf
+	TimingReceiver.pdf \
+	Dice.pdf
 endif
 
 libsaftlib_la_LIBADD = $(GIOMM_LIBS)
@@ -114,7 +118,9 @@ nodist_libsaftlib_la_SOURCES =	\
 	SCUbusCondition.cpp	\
 	SoftwareActionSink.cpp	\
 	SoftwareCondition.cpp	\
-	TimingReceiver.cpp
+	TimingReceiver.cpp \
+	iDice.cpp \
+	Dice.cpp
 
 $(doc_DATA:.pdf=.doc-xml) $(nodist_libsaftlib_la_SOURCES) $(nodist_saftlib_HEADERS):	$(NODES) $(INTERFACES) $(XSL)
 	$(XSLTPROC) --path $(srcdir) --xinclude $(srcdir)/h.xsl $(NODES)
