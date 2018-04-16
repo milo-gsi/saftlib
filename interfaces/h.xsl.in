@@ -145,6 +145,11 @@
         <xsl:call-template name="signal-type"/>
         <xsl:text>;&#10;</xsl:text>
       </xsl:for-each>
+      <xsl:for-each select="fast-signal">
+        <xsl:text>    </xsl:text>
+        <xsl:call-template name="signal-type"/>
+        <xsl:text>;&#10;</xsl:text>
+      </xsl:for-each>
     </xsl:for-each>
     <xsl:if test="$proxy_abc">    */&#10;</xsl:if>
 
@@ -180,6 +185,11 @@
 
     <xsl:for-each select="interface">
       <xsl:for-each select="signal">
+        <xsl:text>    sigc::connection con_sig</xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>;&#10;</xsl:text>
+      </xsl:for-each>
+      <xsl:for-each select="fast-signal">
         <xsl:text>    sigc::connection con_sig</xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text>;&#10;</xsl:text>
@@ -276,6 +286,9 @@
       <xsl:call-template name="caps-name"><xsl:with-param name="name" select="$iface"/></xsl:call-template>
       <xsl:text>_IFACE_H&#10;&#10;</xsl:text>
 
+      <xsl:if test="not(count(fast-signal)=0)">
+        <xsl:text>#include &lt;vector&gt;&#10;</xsl:text>
+      </xsl:if>
       <xsl:text>#include &lt;giomm/dbusproxy.h&gt;&#10;</xsl:text>
       <xsl:text>#include &lt;giomm/dbuserror.h&gt;&#10;&#10;</xsl:text>
       <xsl:text>#include &lt;giomm.h&gt;&#10;&#10;</xsl:text>
@@ -344,6 +357,11 @@
         <xsl:call-template name="signal-type"/>
         <xsl:text>;&#10;</xsl:text>
       </xsl:for-each>
+      <xsl:for-each select="fast-signal">
+        <xsl:text>    </xsl:text>
+        <xsl:call-template name="signal-type"/>
+        <xsl:text>;&#10;</xsl:text>
+      </xsl:for-each>
 
       <xsl:text>};&#10;&#10;</xsl:text>
 
@@ -363,7 +381,13 @@
       const Glib::ustring&amp; name,
       Gio::DBus::BusType bus_type, 
       Gio::DBus::ProxyFlags flags);&#10;&#10;<xsl:text/>
-      
+
+      <!-- destructor closes the pipe that is used for fast signal reception -->
+      <xsl:if test="not(count(fast-signal)=0)">           
+        <xsl:text>     ~i</xsl:text>
+        <xsl:value-of select="$iface"/>_Proxy();&#10;&#10;<xsl:text/>
+      </xsl:if>
+
       <!-- Concrete implementations -->
       <xsl:text>    // Implement abstract base class methods&#10;</xsl:text>
       <xsl:for-each select="method">
@@ -401,13 +425,27 @@
         <xsl:call-template name="signal-type"/>
         <xsl:text>;&#10;</xsl:text>
       </xsl:for-each>
+      <xsl:for-each select="fast-signal">
+        <xsl:text>    </xsl:text>
+        <xsl:call-template name="signal-type"/>
+        <xsl:text>;&#10;</xsl:text>
+      </xsl:for-each>
 
       <xsl:if test="$proxy_abc">    */&#10;</xsl:if>
 
-      <!-- Forbid copy -->
       <xsl:text>&#10;  private:&#10;</xsl:text>
+      <xsl:if test="not(count(fast-signal)=0)">   
+        <!-- connection of the fast-signal pipe to the glib main-loop -->
+        <xsl:text>    // connection of main loop to fast_pipe&#10;</xsl:text>
+        <xsl:text>    sigc::connection fastsig_connection;&#10;</xsl:text>
+        <!-- dispatcher for fast signals -->
+        <xsl:text>    // dispatcher for fast-signals&#10;</xsl:text>
+        <xsl:text>     bool dispatchFastSignals(Glib::IOCondition condition);&#10;&#10;</xsl:text>
+      </xsl:if>
       <xsl:text>    // noncopyable&#10;</xsl:text>
       <xsl:text>    i</xsl:text>
+
+      <!-- Forbid copy -->
       <xsl:value-of select="$iface"/>_Proxy(const i<xsl:value-of select="$iface"/>_Proxy&amp;);&#10;<xsl:text/>
       <xsl:text>    i</xsl:text>
       <xsl:value-of select="$iface"/>_Proxy&amp; operator=(const i<xsl:value-of select="$iface"/>_Proxy&amp;);&#10;<xsl:text/>
@@ -418,7 +456,10 @@
       <xsl:text>AsyncCallReady(Glib::RefPtr&lt;Gio::AsyncResult&gt;&amp; async_result, GMainLoop *loop, Glib::VariantContainerBase *result, Glib::ustring *exceptionMsg);&#10;&#10;</xsl:text>
 
       <xsl:text>    // notification if async DBus call is completed&#10;</xsl:text>
-
+      <xsl:if test="not(count(fast-signal)=0)">
+        gint fast_signal_pipe_fd[2];
+        gint close_signal_pipe_fd[2];
+      </xsl:if>
       <!-- Implementation -->
   protected:
     void on_properties_changed(const MapChangedProperties&amp; changed_properties, const std::vector&lt; Glib::ustring &gt;&amp; invalidated_properties);
@@ -450,6 +491,13 @@ class i<xsl:value-of select="$iface"/>_Service {
     // non-copyable
     i<xsl:value-of select="$iface"/>_Service(const i<xsl:value-of select="$iface"/>_Service&amp;);
     i<xsl:value-of select="$iface"/>_Service&amp; operator=(const i<xsl:value-of select="$iface"/>_Service&amp;);
+    <xsl:if test="not(count(fast-signal)=0)">   
+      std::vector&lt;gint&gt; close_signal_pipes_fd0; // reading end
+      std::vector&lt;gint&gt; fast_signal_pipes_fd1;  // writing end
+      sigc::connection fastsig_close;&#10;
+      <xsl:text>     bool closeFastSignals(Glib::IOCondition condition);&#10;&#10;</xsl:text>
+      int signal_seq_id;
+    </xsl:if>
   private:
     i<xsl:value-of select="$iface"/> *impl;
     sigc::slot&lt;void, const char*&gt; rethrow;<xsl:text/>
@@ -459,6 +507,9 @@ class i<xsl:value-of select="$iface"/>_Service {
       </xsl:if>
     </xsl:for-each>
     <xsl:for-each select="signal">
+    sigc::connection con_sig<xsl:value-of select="@name"/>;<xsl:text/>
+    </xsl:for-each>
+    <xsl:for-each select="fast-signal">
     sigc::connection con_sig<xsl:value-of select="@name"/>;<xsl:text/>
     </xsl:for-each>
     const Gio::DBus::InterfaceVTable interface_vtable;
@@ -485,6 +536,13 @@ class i<xsl:value-of select="$iface"/>_Service {
       </xsl:if>
     </xsl:for-each>
     <xsl:for-each select="signal">
+      <xsl:text>    </xsl:text>
+      <xsl:call-template name="signal-mtype">
+        <xsl:with-param name="namespace" select="'on_sig'"/>
+      </xsl:call-template>
+      <xsl:text>;&#10;</xsl:text>
+    </xsl:for-each>
+    <xsl:for-each select="fast-signal">
       <xsl:text>    </xsl:text>
       <xsl:call-template name="signal-mtype">
         <xsl:with-param name="namespace" select="'on_sig'"/>
