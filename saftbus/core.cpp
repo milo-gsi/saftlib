@@ -42,7 +42,7 @@ namespace saftbus
   }
   void init()
   {
-    std::cerr << "ignoring SIGPIPE" << std::endl;
+    //std::cerr << "ignoring SIGPIPE" << std::endl;
     //signal(SIGPIPE, SIG_IGN);
     block_signal(SIGPIPE);
   }
