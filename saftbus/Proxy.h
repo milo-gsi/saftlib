@@ -3,6 +3,8 @@
 
 #include <map>
 #include <giomm.h>
+#include <thread>
+#include <mutex>
 
 #include "saftbus.h"
 
@@ -41,7 +43,7 @@ namespace saftbus
 		const Glib::VariantContainerBase& call_sync(std::string function_name, const Glib::VariantContainerBase &query);
 
 	private:
-		static Glib::RefPtr<saftbus::ProxyConnection> _connection;
+		static std::map<std::thread::id, Glib::RefPtr<saftbus::ProxyConnection> > _connection;
 		static bool _connection_created;
 
 		Glib::ustring _name;

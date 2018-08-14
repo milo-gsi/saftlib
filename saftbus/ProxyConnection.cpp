@@ -15,6 +15,14 @@
 namespace saftbus
 {
 
+Glib::RefPtr<Glib::MainContext> ProxyConnection::_default_context = Glib::MainContext::get_default();
+
+void ProxyConnection::set_defautl_context(Glib::RefPtr<Glib::MainContext> context)
+{
+	_default_context = context;
+}
+
+
 ProxyConnection::ProxyConnection(const Glib::ustring &base_name)
 {
 	int _debug_level = 1;
@@ -55,7 +63,7 @@ ProxyConnection::ProxyConnection(const Glib::ustring &base_name)
 			} 
 		}
 	}
-    Glib::signal_io().connect(sigc::mem_fun(*this, &ProxyConnection::dispatch), _create_socket, Glib::IO_IN | Glib::IO_HUP, Glib::PRIORITY_HIGH);
+    _default_context->signal_io().connect(sigc::mem_fun(*this, &ProxyConnection::dispatch), _create_socket, Glib::IO_IN | Glib::IO_HUP, Glib::PRIORITY_HIGH);
 
 	// create what is called "Sender" in DBus terms. It is a number unique to the running process
     std::ostringstream id_out;

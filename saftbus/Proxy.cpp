@@ -8,7 +8,7 @@
 namespace saftbus
 {
 
-Glib::RefPtr<saftbus::ProxyConnection> Proxy::_connection;
+std::map<std::thread::id, Glib::RefPtr<saftbus::ProxyConnection> > Proxy::_connection;
 bool Proxy::_connection_created = false;
 
 Proxy::Proxy(saftbus::BusType  	bus_type,
@@ -21,15 +21,15 @@ Proxy::Proxy(saftbus::BusType  	bus_type,
   , _object_path(object_path)
   , _interface_name(interface_name)
 {
-	if (_debug_level > 5) std::cerr << "Proxy::Proxy(" << name << "," << object_path << "," << interface_name << ") called   _connection_created = " << static_cast<bool>(_connection) << std::endl;
+	if (_debug_level > 5) std::cerr << "Proxy::Proxy(" << name << "," << object_path << "," << interface_name << ") called   _connection_created = " << static_cast<bool>(_connection[std::this_thread::get_id()]) << std::endl;
 
-	if (!static_cast<bool>(_connection)) {
+	if (!static_cast<bool>(_connection[std::this_thread::get_id()])) {
 		if (_debug_level > 5) std::cerr << "   this process has no ProxyConnection yet. Creating one now" << std::endl;
-		_connection = Glib::RefPtr<saftbus::ProxyConnection>(new ProxyConnection);
+		_connection[std::this_thread::get_id()] = Glib::RefPtr<saftbus::ProxyConnection>(new ProxyConnection);
 		if (_debug_level > 5) std::cerr << "   ProxyConnection created" << std::endl;
 	}
 
-	_connection->register_proxy(interface_name, object_path, this);
+	_connection[std::this_thread::get_id()]->register_proxy(interface_name, object_path, this);
 }
 
 
@@ -59,7 +59,7 @@ void Proxy::on_signal (const Glib::ustring& sender_name, const Glib::ustring& si
 Glib::RefPtr<saftbus::ProxyConnection> Proxy::get_connection() const
 {
 	if (_debug_level > 5) std::cerr << "Proxy::get_connection() called " << std::endl;
-	return _connection;
+	return _connection[std::this_thread::get_id()];
 }
 
 Glib::ustring Proxy::get_object_path() const
@@ -80,7 +80,7 @@ const Glib::VariantContainerBase& Proxy::call_sync(std::string function_name, co
 	// generated Proxy code cannot handle the resulting variant type.
 	_result = Glib::VariantBase::cast_dynamic<Glib::VariantContainerBase>(
 			  	Glib::VariantBase::cast_dynamic<Glib::Variant<std::vector<Glib::VariantBase> > >(
-						_connection->call_sync(_object_path, 
+						_connection[std::this_thread::get_id()]->call_sync(_object_path, 
 		                			          _interface_name,
 		                			          function_name,
 		                			          query)).get_child(0));

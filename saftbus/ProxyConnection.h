@@ -54,7 +54,11 @@ namespace saftbus
 
 		int get_fd() const {return _create_socket; }
 		Glib::ustring get_saftbus_id() { return _saftbus_id; }
+
+		static void set_defautl_context(Glib::RefPtr<Glib::MainContext> context);
 	private:
+
+		static Glib::RefPtr<Glib::MainContext> _default_context;
 
 		// this is the information that is needed to keep connected to a socket
 		int _create_socket;
