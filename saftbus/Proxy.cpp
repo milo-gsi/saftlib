@@ -9,6 +9,8 @@ namespace saftbus
 {
 
 std::map<std::thread::id, Glib::RefPtr<saftbus::ProxyConnection> > Proxy::_connection;
+std::mutex Proxy::_connection_mutex;
+
 bool Proxy::_connection_created = false;
 
 Proxy::Proxy(saftbus::BusType  	bus_type,
@@ -23,12 +25,12 @@ Proxy::Proxy(saftbus::BusType  	bus_type,
 {
 	if (_debug_level > 5) std::cerr << "Proxy::Proxy(" << name << "," << object_path << "," << interface_name << ") called   _connection_created = " << static_cast<bool>(_connection[std::this_thread::get_id()]) << std::endl;
 
+	std::unique_lock<std::mutex> lock(_connection_mutex);
 	if (!static_cast<bool>(_connection[std::this_thread::get_id()])) {
 		if (_debug_level > 5) std::cerr << "   this process has no ProxyConnection yet. Creating one now" << std::endl;
 		_connection[std::this_thread::get_id()] = Glib::RefPtr<saftbus::ProxyConnection>(new ProxyConnection);
 		if (_debug_level > 5) std::cerr << "   ProxyConnection created" << std::endl;
 	}
-
 	_connection[std::this_thread::get_id()]->register_proxy(interface_name, object_path, this);
 }
 
@@ -59,6 +61,7 @@ void Proxy::on_signal (const Glib::ustring& sender_name, const Glib::ustring& si
 Glib::RefPtr<saftbus::ProxyConnection> Proxy::get_connection() const
 {
 	if (_debug_level > 5) std::cerr << "Proxy::get_connection() called " << std::endl;
+	std::unique_lock<std::mutex> lock(_connection_mutex);
 	return _connection[std::this_thread::get_id()];
 }
 
@@ -78,12 +81,14 @@ const Glib::VariantContainerBase& Proxy::call_sync(std::string function_name, co
 	std::cerr << "Proxy::call_sync(" << function_name << ") called" << std::endl;
 	// call the Connection::call_sync in a special way that  it to cast the result in a special way. Otherwise the 
 	// generated Proxy code cannot handle the resulting variant type.
+	std::unique_lock<std::mutex> lock(_connection_mutex);
 	_result = Glib::VariantBase::cast_dynamic<Glib::VariantContainerBase>(
 			  	Glib::VariantBase::cast_dynamic<Glib::Variant<std::vector<Glib::VariantBase> > >(
 						_connection[std::this_thread::get_id()]->call_sync(_object_path, 
 		                			          _interface_name,
 		                			          function_name,
 		                			          query)).get_child(0));
+	lock.unlock();
 	return _result;
 }
 

@@ -44,6 +44,7 @@ namespace saftbus
 
 	private:
 		static std::map<std::thread::id, Glib::RefPtr<saftbus::ProxyConnection> > _connection;
+		static std::mutex _connection_mutex;
 		static bool _connection_created;
 
 		Glib::ustring _name;

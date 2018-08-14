@@ -15,16 +15,23 @@
 namespace saftbus
 {
 
-Glib::RefPtr<Glib::MainContext> ProxyConnection::_default_context = Glib::MainContext::get_default();
+std::map<std::thread::id, Glib::RefPtr<Glib::MainContext> > ProxyConnection::_default_context;
+std::mutex ProxyConnection::_context_mutex;
 
-void ProxyConnection::set_defautl_context(Glib::RefPtr<Glib::MainContext> context)
+
+void ProxyConnection::set_default_context(Glib::RefPtr<Glib::MainContext> context)
 {
-	_default_context = context;
+	std::unique_lock<std::mutex> lock(_context_mutex);
+	_default_context[std::this_thread::get_id()] = context;
 }
 
 
 ProxyConnection::ProxyConnection(const Glib::ustring &base_name)
 {
+	std::unique_lock<std::mutex> lock(_context_mutex);
+	if (_default_context.find(std::this_thread::get_id()) == _default_context.end()) { // if no default context was set
+		_default_context[std::this_thread::get_id()] = Glib::MainContext::get_default();
+	}
 	int _debug_level = 1;
 	// try to open first available socket
 	_create_socket = socket(PF_LOCAL, SOCK_STREAM, 0);
@@ -63,7 +70,9 @@ ProxyConnection::ProxyConnection(const Glib::ustring &base_name)
 			} 
 		}
 	}
-    _default_context->signal_io().connect(sigc::mem_fun(*this, &ProxyConnection::dispatch), _create_socket, Glib::IO_IN | Glib::IO_HUP, Glib::PRIORITY_HIGH);
+
+
+    _default_context[std::this_thread::get_id()]->signal_io().connect(sigc::mem_fun(*this, &ProxyConnection::dispatch), _create_socket, Glib::IO_IN | Glib::IO_HUP, Glib::PRIORITY_HIGH);
 
 	// create what is called "Sender" in DBus terms. It is a number unique to the running process
     std::ostringstream id_out;
