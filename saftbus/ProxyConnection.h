@@ -57,9 +57,10 @@ namespace saftbus
 		int get_fd() const {return _create_socket; }
 		Glib::ustring get_saftbus_id() { return _saftbus_id; }
 
-		static void set_default_context(Glib::RefPtr<Glib::MainContext> context);
+		static thread_local void set_default_context(Glib::RefPtr<Glib::MainContext> context);
 	private:
 
+		//static thread_local Glib::RefPtr<Glib::MainContext> _default_context;
 		static std::map<std::thread::id, Glib::RefPtr<Glib::MainContext> > _default_context;
 		static std::mutex _context_mutex;
 

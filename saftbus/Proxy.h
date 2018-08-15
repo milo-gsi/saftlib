@@ -42,10 +42,10 @@ namespace saftbus
 
 		const Glib::VariantContainerBase& call_sync(std::string function_name, const Glib::VariantContainerBase &query);
 
+		static thread_local void set_default_context(Glib::RefPtr<Glib::MainContext> context);
+
 	private:
-		static std::map<std::thread::id, Glib::RefPtr<saftbus::ProxyConnection> > _connection;
-		static std::mutex _connection_mutex;
-		static bool _connection_created;
+		static thread_local Glib::RefPtr<saftbus::ProxyConnection> _connection;
 
 		Glib::ustring _name;
 		Glib::ustring _object_path;

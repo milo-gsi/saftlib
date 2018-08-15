@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     // //sleep(1);
 
     // before any proxy is used, the MainContext in which it should run has to be set
-    saftbus::ProxyConnection::set_default_context(Glib::MainContext::get_default());
+    saftbus::Proxy::set_default_context(Glib::MainContext::get_default());
     //get a specific device
     std::map<Glib::ustring, Glib::ustring> devices = saftlib::SAFTd_Proxy::create()->getDevices();
     for (auto it = devices.begin(); it != devices.end(); ++it) {
