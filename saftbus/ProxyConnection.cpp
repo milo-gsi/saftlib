@@ -77,7 +77,7 @@ ProxyConnection::ProxyConnection(const Glib::ustring &base_name)
 	// create what is called "Sender" in DBus terms. It is a number unique to the running process
     std::ostringstream id_out;
     id_out << this;
-    std::cerr << "ProxyConnection::ProxyConnection(" << base_name << ") created id " << id_out.str() << std::endl;
+    // std::cerr << "ProxyConnection::ProxyConnection(" << base_name << ") created id " << id_out.str() << std::endl;
     _saftbus_id = id_out.str();
 	write(get_fd(), saftbus::SENDER_ID);
 	write(get_fd(), _saftbus_id);
@@ -240,7 +240,7 @@ void ProxyConnection::dispatchSignal()
 		// std::map<Glib::ustring, Glib::VariantBase> property_map;
 		// parametrs.get(property_map 0)
 		Glib::Variant<Glib::ustring> derived_interface_name = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring> >(parameters.get_child(0));
-		std::cerr << "derived_interface_name = " << derived_interface_name.print() << std::endl;
+		//std::cerr << "derived_interface_name = " << derived_interface_name.print() << std::endl;
 		auto interfaces = _proxies.find(derived_interface_name.get());
 		if (interfaces != _proxies.end()) {
 			if (interfaces->second.find(object_path.get()) != interfaces->second.end()) {
@@ -255,7 +255,7 @@ void ProxyConnection::dispatchSignal()
 			                - (1.0e6*sec.get() + 1.0e-3*nsec.get());
 			    // deliver the signal
 				_proxies[derived_interface_name.get()][object_path.get()]->on_properties_changed(property_map.get(), invalidated_properies.get());
-			    std::cerr << "signal flight time = " << dt << " us" << std::endl;
+			    //std::cerr << "signal flight time = " << dt << " us" << std::endl;
 			}
 		}
 
@@ -272,7 +272,7 @@ void ProxyConnection::dispatchSignal()
 			      double dt = (1.0e6*stop.tv_sec   + 1.0e-3*stop.tv_nsec) 
 			                - (1.0e6*sec.get() + 1.0e-3*nsec.get());
 				_proxies[interface_name.get()][object_path.get()]->on_signal("de.gsi.saftlib", signal_name.get(), parameters);
-			    std::cerr << "signal flight time = " << dt << " us" << std::endl;
+			    //std::cerr << "signal flight time = " << dt << " us" << std::endl;
 			}
 		}
 
