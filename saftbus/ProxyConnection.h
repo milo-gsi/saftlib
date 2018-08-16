@@ -46,23 +46,26 @@ namespace saftbus
 	private:
 		bool dispatch(Glib::IOCondition condition);
 		void dispatchSignal();
-	public:
-		void register_proxy(Glib::ustring interface_name, Glib::ustring object_path, Proxy *proxy);
 
 		// wait for response from server, expect a specific message type
 		// if a signal is coming instead, handle the signal
 		// do this until the correct type comes and return to caller
 		bool expect_from_server(MessageTypeS2C type);
 
+	public:
+		void register_proxy(Glib::ustring interface_name, Glib::ustring object_path, Proxy *proxy);
+
+
 		int get_fd() const {return _create_socket; }
 		Glib::ustring get_saftbus_id() { return _saftbus_id; }
 
-		static thread_local void set_default_context(Glib::RefPtr<Glib::MainContext> context);
+		//static thread_local void set_default_context(Glib::RefPtr<Glib::MainContext> context);
 	private:
 
 		//static thread_local Glib::RefPtr<Glib::MainContext> _default_context;
-		static std::map<std::thread::id, Glib::RefPtr<Glib::MainContext> > _default_context;
-		static std::mutex _context_mutex;
+		//static std::map<std::thread::id, Glib::RefPtr<Glib::MainContext> > _default_context;
+		//static std::mutex _context_mutex;
+		static std::mutex _socket_mutex;
 
 		// this is the information that is needed to keep connected to a socket
 		int _create_socket;

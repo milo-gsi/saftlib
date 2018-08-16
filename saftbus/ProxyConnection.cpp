@@ -15,23 +15,23 @@
 namespace saftbus
 {
 
-std::map<std::thread::id, Glib::RefPtr<Glib::MainContext> > ProxyConnection::_default_context;
-std::mutex ProxyConnection::_context_mutex;
+// std::map<std::thread::id, Glib::RefPtr<Glib::MainContext> > ProxyConnection::_default_context;
+// std::mutex ProxyConnection::_context_mutex;
+std::mutex ProxyConnection::_socket_mutex;
 
-
-void ProxyConnection::set_default_context(Glib::RefPtr<Glib::MainContext> context)
-{
-	std::unique_lock<std::mutex> lock(_context_mutex);
-	_default_context[std::this_thread::get_id()] = context;
-}
+// void ProxyConnection::set_default_context(Glib::RefPtr<Glib::MainContext> context)
+// {
+// 	std::unique_lock<std::mutex> lock(_context_mutex);
+// 	_default_context[std::this_thread::get_id()] = context;
+// }
 
 
 ProxyConnection::ProxyConnection(const Glib::ustring &base_name)
 {
-	std::unique_lock<std::mutex> lock(_context_mutex);
-	if (_default_context.find(std::this_thread::get_id()) == _default_context.end()) { // if no default context was set
-		_default_context[std::this_thread::get_id()] = Glib::MainContext::get_default();
-	}
+	std::unique_lock<std::mutex> lock(_socket_mutex);
+	// if (_default_context.find(std::this_thread::get_id()) == _default_context.end()) { // if no default context was set
+	// 	_default_context[std::this_thread::get_id()] = Glib::MainContext::get_default();
+	// }
 	int _debug_level = 1;
 	// try to open first available socket
 	_create_socket = socket(PF_LOCAL, SOCK_STREAM, 0);
@@ -72,7 +72,7 @@ ProxyConnection::ProxyConnection(const Glib::ustring &base_name)
 	}
 
 
-    _default_context[std::this_thread::get_id()]->signal_io().connect(sigc::mem_fun(*this, &ProxyConnection::dispatch), _create_socket, Glib::IO_IN | Glib::IO_HUP, Glib::PRIORITY_HIGH);
+    Glib::signal_io().connect(sigc::mem_fun(*this, &ProxyConnection::dispatch), _create_socket, Glib::IO_IN | Glib::IO_HUP, Glib::PRIORITY_HIGH);
 
 	// create what is called "Sender" in DBus terms. It is a number unique to the running process
     std::ostringstream id_out;
@@ -87,6 +87,8 @@ ProxyConnection::ProxyConnection(const Glib::ustring &base_name)
 
 Glib::VariantContainerBase& ProxyConnection::call_sync (const Glib::ustring& object_path, const Glib::ustring& interface_name, const Glib::ustring& name, const Glib::VariantContainerBase& parameters, const Glib::ustring& bus_name, int timeout_msec)
 {
+	std::unique_lock<std::mutex> lock(_socket_mutex);
+
 	if (_debug_level > 5) std::cerr << "ProxyConnection::call_sync(" << object_path << "," << interface_name << "," << name << ") called" << std::endl;
 	// first append message meta informations like: type of message, recipient, sender, interface name
 	std::vector<Glib::VariantBase> message;
@@ -185,6 +187,7 @@ void ProxyConnection::register_proxy(Glib::ustring interface_name, Glib::ustring
 
 bool ProxyConnection::dispatch(Glib::IOCondition condition) 
 {
+	std::unique_lock<std::mutex> lock(_socket_mutex);
 	if (_debug_level > 5) std::cerr << "ProxyConnection::dispatch() called" << std::endl;
 
 	saftbus::MessageTypeS2C type = saftbus::SIGNAL;

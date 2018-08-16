@@ -8,12 +8,13 @@
 namespace saftbus
 {
 
-thread_local Glib::RefPtr<saftbus::ProxyConnection> Proxy::_connection;
+Glib::RefPtr<saftbus::ProxyConnection> Proxy::_connection;
+std::mutex Proxy::_connection_mutex;
 
-void Proxy::set_default_context(Glib::RefPtr<Glib::MainContext> context)
-{
-	_connection->set_default_context(context);
-}
+// void Proxy::set_default_context(Glib::RefPtr<Glib::MainContext> context)
+// {
+// 	_connection->set_default_context(context);
+// }
 
 Proxy::Proxy(saftbus::BusType  	bus_type,
 	const Glib::ustring&  	name,
@@ -25,6 +26,7 @@ Proxy::Proxy(saftbus::BusType  	bus_type,
   , _object_path(object_path)
   , _interface_name(interface_name)
 {
+	std::unique_lock<std::mutex> lock(_connection_mutex);
 	if (_debug_level > 5) std::cerr << "Proxy::Proxy(" << name << "," << object_path << "," << interface_name << ") called   _connection_created = " << static_cast<bool>(_connection) << std::endl;
 
 	if (!static_cast<bool>(_connection)) {
@@ -78,7 +80,8 @@ Glib::ustring Proxy::get_name() const
 
 const Glib::VariantContainerBase& Proxy::call_sync(std::string function_name, const Glib::VariantContainerBase &query)
 {
-	std::cerr << "Proxy::call_sync(" << function_name << ") called" << std::endl;
+	std::unique_lock<std::mutex> lock(_connection_mutex);
+	//std::cerr << "Proxy::call_sync(" << function_name << ") called" << std::endl;
 	// call the Connection::call_sync in a special way that  it to cast the result in a special way. Otherwise the 
 	// generated Proxy code cannot handle the resulting variant type.
 	_result = Glib::VariantBase::cast_dynamic<Glib::VariantContainerBase>(

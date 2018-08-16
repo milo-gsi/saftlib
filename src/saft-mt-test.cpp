@@ -61,9 +61,9 @@ static void on_action(guint64 id, guint64 param, guint64 deadline, guint64 execu
 // runs in separate thread
 void* snoop(void *data) 
 {
-  Glib::RefPtr<Glib::MainContext> context = Glib::MainContext::create();
-  Glib::RefPtr<Glib::MainLoop> loop = Glib::MainLoop::create(context);
-  saftbus::ProxyConnection::set_default_context(context);
+//  Glib::RefPtr<Glib::MainContext> context = Glib::MainContext::create();
+  Glib::RefPtr<Glib::MainLoop> loop = *(reinterpret_cast<Glib::RefPtr<Glib::MainLoop>*>(data));
+  //saftbus::ProxyConnection::set_default_context(context);
   Glib::ustring deviceName = "tr0";
   std::cerr << "snoop tread : " << pthread_self() << std::endl;
   Glib::RefPtr<saftlib::SAFTd_Proxy> saftd = saftlib::SAFTd_Proxy::create();
@@ -89,6 +89,16 @@ void* snoop(void *data)
   return nullptr;
 }
 
+void* readtime(void * data)
+{
+  Glib::RefPtr<saftlib::TimingReceiver_Proxy> receiver = *(reinterpret_cast<Glib::RefPtr<saftlib::TimingReceiver_Proxy>*>(data));
+  for (;;) {
+    std::cerr << receiver->ReadCurrentTime() << std::endl;
+    std::cerr << receiver->ReadCurrentTime() << std::endl;
+    sleep(1);
+  }
+}
+
 int main(int argc, char** argv)
 {
  
@@ -102,18 +112,16 @@ int main(int argc, char** argv)
 
     //snoop(nullptr);
 
-    // snoop
-    if (true) {
-      pthread_t thread1;
-      int tid1 = pthread_create(&thread1, nullptr, snoop, nullptr);
-    } // eventSnoop
+    // // snoop
+    // if (true) {
+    //   pthread_t thread1;
+    //   int tid1 = pthread_create(&thread1, nullptr, snoop, (void*)&loop);
+    // } // eventSnoop
 
     //sleep(2);
 
-    if (true) {
-      pthread_t thread1;
-      int tid1 = pthread_create(&thread1, nullptr, snoop, nullptr);
-    } // eventSnoop
+    pthread_t thread1;
+    int tid1 = pthread_create(&thread1, nullptr, snoop, (void*)&loop);
 
     //sleep(2);
 
@@ -124,7 +132,7 @@ int main(int argc, char** argv)
     // //sleep(1);
 
     // before any proxy is used, the MainContext in which it should run has to be set
-    saftbus::Proxy::set_default_context(Glib::MainContext::get_default());
+    //saftbus::Proxy::set_default_context(Glib::MainContext::get_default());
     //get a specific device
     std::map<Glib::ustring, Glib::ustring> devices = saftlib::SAFTd_Proxy::create()->getDevices();
     for (auto it = devices.begin(); it != devices.end(); ++it) {
@@ -132,20 +140,32 @@ int main(int argc, char** argv)
     }
 
 
-  Glib::RefPtr<saftlib::TimingReceiver_Proxy> receiver = saftlib::TimingReceiver_Proxy::create(devices["tr0"]);
-  Glib::RefPtr<saftlib::SoftwareActionSink_Proxy> sink = saftlib::SoftwareActionSink_Proxy::create(receiver->NewSoftwareActionSink(""));
-  Glib::RefPtr<saftlib::SoftwareCondition_Proxy> condition = saftlib::SoftwareCondition_Proxy::create(sink->NewCondition(false, 0, 0, 0));
-  // Accept all errors
-  condition->setAcceptLate(true);
-  condition->setAcceptEarly(true);
-  condition->setAcceptConflict(true);
-  condition->setAcceptDelayed(true);
-  condition->Action.connect(sigc::ptr_fun(&on_action));
-  condition->setActive(true);
+
+  Glib::RefPtr<saftlib::TimingReceiver_Proxy>     receiver = saftlib::TimingReceiver_Proxy::create(devices["tr0"]);
+  pthread_t thread2;
+  int tid2 = pthread_create(&thread2, nullptr, readtime, (void*)&receiver);
+
+  // for(;;) {
+  //   std::cerr << receiver->ReadCurrentTime() << std::endl;
+  //   std::cerr << receiver->ReadCurrentTime() << std::endl;
+  //   sleep(1);
+  // }
+
+  // Glib::RefPtr<saftlib::SoftwareActionSink_Proxy>     sink = saftlib::SoftwareActionSink_Proxy::create(receiver->NewSoftwareActionSink(""));
+  // Glib::RefPtr<saftlib::SoftwareCondition_Proxy> condition = saftlib::SoftwareCondition_Proxy::create(sink->NewCondition(false, 0, 0, 0));
+  // // Accept all errors
+  // condition->setAcceptLate(true);
+  // condition->setAcceptEarly(true);
+  // condition->setAcceptConflict(true);
+  // condition->setAcceptDelayed(true);
+  // condition->Action.connect(sigc::ptr_fun(&on_action));
+  // condition->setActive(true);
 
 
-    // // std::cerr << "starting main thread main loop" << std::endl;
-    loop->run();
+  //   // // std::cerr << "starting main thread main loop" << std::endl;
+  //loop->run();
+  pthread_join(thread1, nullptr);
+  pthread_join(thread2, nullptr);
 
 
   } catch (const Glib::Error& error) {
