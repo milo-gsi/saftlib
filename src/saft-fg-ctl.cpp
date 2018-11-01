@@ -336,7 +336,7 @@ int main(int argc, char** argv)
     if (eventSet) scu->NewCondition(true, event, ~0, 0, tag);
 
     // Trigger the function generator ourselves?
-    if (generate) gen->Armed.connect(sigc::bind(sigc::ptr_fun(&on_armed), scu, tag));
+    if (generate) gen->SigArmed.connect(sigc::bind(sigc::ptr_fun(&on_armed), scu, tag));
     
     // Ready to execute!
     gen->setStartTag(tag);
