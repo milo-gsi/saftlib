@@ -80,7 +80,7 @@
 
          Parameters are sent as a vector of vectors. 
          The outside vectors contain a coefficient vector for each FG and must be of the same size
-         and <= the number of active FGs.
+         and less or equal the number of active FGs.
          The coefficient vectors for each FG's parameter set must be the same size
          but different FGs may have different parameter set sizes. 
          If there is no data for an individual function generator an empty vector 

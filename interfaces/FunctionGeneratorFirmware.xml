@@ -7,7 +7,9 @@
   <!-- de.gsi.saftlib.FunctionGeneratorFirmware:
       @short_description: Representation of the FunctionGenerator Firmware
 
-      long description
+      This device represents the lm32-firmware that serves the function generator
+      channels. This firmware can rescan the attached busses (in particular MIL).
+      If a bus scan is needed it can be initiated with the Scan method.
    -->
   <interface name="de.gsi.saftlib.FunctionGeneratorFirmware">
     

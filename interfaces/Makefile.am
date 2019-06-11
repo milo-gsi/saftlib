@@ -83,7 +83,9 @@ doc_DATA = 			\
 	Device.pdf		\
 	SAFTd.pdf		\
 	EventSource.pdf		\
+	FunctionGeneratorFirmware.pdf	\
 	FunctionGenerator.pdf	\
+	MasterFunctionGenerator.pdf	\
 	InputEventSource.pdf	\
 	MILbusActionSink.pdf	\
 	MILbusCondition.pdf	\
