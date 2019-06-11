@@ -153,9 +153,10 @@ $(doc_DATA:.pdf=.doc-xml) $(nodist_libsaftlib_la_SOURCES) $(nodist_saftlib_HEADE
 	$(XSLTPROC) --path $(srcdir) --xinclude $(srcdir)/doc.xsl $(NODES)
 
 .doc-xml.pdf:
-	rm -f docfoo-*.$*.*
+	rm -f docfoo-*.$*.* #gdbus-codegen --generate-docbook=docfoo --interface-prefix=de.gsi.saftlib *.doc-xml
 	$(GDBUS_CODEGEN) --generate-docbook=docfoo --interface-prefix=de.gsi.saftlib $<
-	$(XSLTPROC) --path $(srcdir) fix-docbook.xsl docfoo-*.$*.xml > docfoo-fix.$*.xml
-	$(DOCBOOK2PDF) docfoo-fix.$*.xml
+	$(XSLTPROC) --path $(srcdir) fix-docbook.xsl docfoo-de.gsi.saftlib.$*.xml > docfoo-fix.$*.xml
+	$(DOCBOOK2TEXI) --string-param output-file=docfoo-fix.$* docfoo-fix.$*.xml
+	$(TEXI2PDF) docfoo-fix.$*.texi	
 	mv docfoo-*.$*.pdf $@
-	rm -f docfoo-*.$*.*
+	rm -f docfoo-de.gsi.saftlib.$*.xml docfoo-fix.$*.* 
