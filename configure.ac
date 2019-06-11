@@ -65,8 +65,13 @@ AC_PATH_PROGS([GDBUS_CODEGEN], [gdbus-codegen])
 AC_PATH_PROGS([DOCBOOK2MAN], [docbook2man])
 AC_PATH_PROGS([GIT], [git])
 
+AC_ARG_ENABLE([pdf-doc], 
+              [AS_HELP_STRING([--enable-pdf-doc], [generate pdf documentation of interfaces])], 
+              [ENABLE_PDF_DOC=yes], 
+              []
+             )
 
-AM_CONDITIONAL([INTERFACE_DOCS], [test x$DOCBOOK2TEXI != x -a x$TEXI2PDF != x -a x$GDBUS_CODEGEN != x])
+AM_CONDITIONAL([INTERFACE_DOCS], [test x$ENABLE_PDF_DOC != x -a x$DOCBOOK2TEXI != x -a x$TEXI2PDF != x -a x$GDBUS_CODEGEN != x])
 AM_CONDITIONAL([REBUILD_MAN_PAGES], [test x$DOCBOOK2MAN != x])
 AM_CONDITIONAL([GIT_TREE], [test x$GIT != x -a -e .git])
 if test -e .git -a "x$DOCBOOK2MAN" = "x"; then
