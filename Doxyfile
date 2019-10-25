@@ -733,7 +733,7 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./drivers ./src \
+INPUT                  = ./drivers ./src ./saftbus \
                          ./doc/CreateSaftlibInterface.md \
                          ./doc/CreateSaftlibDriver.md \
                          ./doc/CompileAndConfigureSaftlib.md
