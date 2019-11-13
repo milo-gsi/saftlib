@@ -2,7 +2,7 @@ SUBDIRS = interfaces saftbus saftcommon
 SAFTLIBS = interfaces/libsaftlib.la saftbus/libsaftbus.la saftcommon/libsaftcommon.la $(SIGCPP_LIBS)
 
 sbin_PROGRAMS = saftd
-bin_PROGRAMS = saft-ctl saft-fg-ctl saft-mfg-ctl saft-io-ctl saft-pps-gen saft-ecpu-ctl saft-scu-ctl saft-clk-gen saft-dm saft-gmt-check saft-lcd
+bin_PROGRAMS = saft-ctl saft-fg-ctl saft-mfg-ctl saft-io-ctl saft-pps-gen saft-ecpu-ctl saft-wbm-ctl saft-scu-ctl saft-clk-gen saft-dm saft-gmt-check saft-lcd
 noinst_PROGRAMS = client
 
 pkgdir = @libdir@/pkgconfig
@@ -38,6 +38,7 @@ saftd_SOURCES = version.h \
 	drivers/SCUbusCondition.cpp	drivers/SCUbusCondition.h	\
 	drivers/EmbeddedCPUCondition.cpp	drivers/EmbeddedCPUCondition.h	\
 	drivers/MILbusCondition.cpp	drivers/MILbusCondition.h	\
+	drivers/WbmCondition.cpp	drivers/WbmCondition.h	\
 	drivers/ActionSink.cpp		drivers/ActionSink.h		\
 	drivers/EventSource.cpp		drivers/EventSource.h		\
 	drivers/InoutImpl.cpp           drivers/InoutImpl.h		\
@@ -45,6 +46,7 @@ saftd_SOURCES = version.h \
 	drivers/SCUbusActionSink.cpp	drivers/SCUbusActionSink.h	\
 	drivers/EmbeddedCPUActionSink.cpp	drivers/EmbeddedCPUActionSink.h	\
 	drivers/MILbusActionSink.cpp	drivers/MILbusActionSink.h	\
+	drivers/WbmActionSink.cpp	drivers/WbmActionSink.h	\
 	drivers/FunctionGeneratorFirmware.cpp	drivers/FunctionGeneratorFirmware.h	\
 	drivers/FunctionGenerator.cpp	drivers/FunctionGenerator.h	\
 	drivers/MasterFunctionGenerator.cpp	drivers/MasterFunctionGenerator.h	\
@@ -66,6 +68,9 @@ saft_ctl_LDADD   = $(GIOMM_LIBS) $(SAFTLIBS) -lpthread
 
 saft_ecpu_ctl_SOURCES = src/saft-ecpu-ctl.cpp
 saft_ecpu_ctl_LDADD   = $(GIOMM_LIBS) $(SAFTLIBS)
+
+saft_wbm_ctl_SOURCES = src/saft-wbm-ctl.cpp
+saft_wbm_ctl_LDADD   = $(GIOMM_LIBS) $(SAFTLIBS)
 
 saft_scu_ctl_SOURCES = src/saft-scu-ctl.cpp
 saft_scu_ctl_LDADD   = $(GIOMM_LIBS) $(SAFTLIBS)
