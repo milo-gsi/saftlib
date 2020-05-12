@@ -313,7 +313,6 @@ public:
 		_treeview.set_activate_on_single_click(true);
 	}
 private:
-
 	bool update_object_paths() {
 		auto object_paths = get_object_paths();
 		_treestore.remove_if_not_present(object_paths);
@@ -325,7 +324,6 @@ private:
 
 	Gtk::TreeView       _treeview;
 	ObjectPathTreeStore _treestore;
-
 };
 
 class InterfaceBox : public Gtk::Box
@@ -567,7 +565,6 @@ public:
 			std::string property_string = saftbus_ctl.call("--list-methods " + interface_name + " " + object_path);
 			std::istringstream in(property_string);
 			for (;;) {
-
 				std::string line;
 				std::getline(in, line);
 				if (!in) break;
@@ -589,13 +586,10 @@ public:
 			}
 		}
 
-
-
 		show_all();
 		//_properties_label.set_text("Properties\n" + property_string);
 		//std::cerr << get_introspection_xml(object_path, interface_name) << std::endl;
 	}
-
 };
 
 class MainWindow : public Gtk::Window 

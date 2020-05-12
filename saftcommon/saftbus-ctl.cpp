@@ -463,8 +463,6 @@ static std::string saftbus_method_call (std::shared_ptr<saftbus::ProxyConnection
 int main(int argc, char *argv[])
 {
 	try {
-		//Glib::init();
-
 		bool interactive_mode             = false;
 		bool list_mutable_state           = false;
 		bool enable_signal_stats          = false;
@@ -653,7 +651,6 @@ int main(int argc, char *argv[])
 			}
 		}
 		if (interactive_mode) {
-			//std::ofstream outputfile("/tmp/saftbus-ctl-output.txt");
 			std::ostream &out = std::cout;
 			bool stop = false;;
 			while (!stop) {
@@ -672,8 +669,6 @@ int main(int argc, char *argv[])
 					}
 					line.push_back(c);
 				}
-				// std::getline(std::cin,line);
-				// if (!std::cin) break;
 				std::istringstream lin(line);
 				for (;;) {
 					std::string token;
