@@ -81,6 +81,7 @@ namespace saftbus
 		using SlotInterfaceGetProperty = sigc::slot< void, Serial&, const std::shared_ptr<Connection>&, const std::string&, const std::string&, const std::string&, const std::string& >;
 		using SlotInterfaceMethodCall = sigc::slot< void, const std::shared_ptr<Connection>&, const std::string&, const std::string&, const std::string&, const std::string&, const Serial&, const std::shared_ptr<MethodInvocation>& >;
 		using SlotInterfaceSetProperty = sigc::slot< bool, const std::shared_ptr<Connection>&, const std::string&, const std::string&, const std::string&, const std::string&, const Serial& >;
+		InterfaceVTable (const InterfaceVTable& vtable); 
 		InterfaceVTable 	( 	
 								const std::string &introspection_xml,
 								const SlotInterfaceMethodCall&  	slot_method_call,

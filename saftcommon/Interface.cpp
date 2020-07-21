@@ -50,6 +50,13 @@ std::vector<int> &Message::get_fd_list()
 // {
 // 	return _fd_list->gobj();
 // }
+InterfaceVTable::InterfaceVTable (const InterfaceVTable& vtable)
+	: _introspection_xml(vtable._introspection_xml)
+	, get_property(vtable.get_property)
+	, set_property(vtable.set_property)
+	, method_call(vtable.method_call)
+{
+}
 
 InterfaceVTable::InterfaceVTable ( 	
 									const std::string &introspection_xml,
