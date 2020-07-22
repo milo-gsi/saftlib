@@ -16,11 +16,18 @@ AM_CPPFLAGS = $(EB_CFLAGS) $(SIGCPP_CFLAGS) -I $(top_srcdir)/src -I $(top_buildd
 BUILT_SOURCES = version.h
 .PHONY: version.h debian # causes build.cpp to be rebuilt every run
 
+saftddir = $(includedir)/saftlib
+saftd_HEADERS = src/Driver.h \
+                src/OpenDevice.h \
+                src/BaseObject.h \
+                src/Device.h 
+
+
 saftd_SOURCES = version.h \
-	src/Device.cpp			src/Device.h			\
-	src/OpenDevice.cpp		src/OpenDevice.h		\
-	src/Driver.cpp			src/Driver.h			\
-	src/BaseObject.cpp		src/BaseObject.h		\
+	src/Device.cpp						\
+	src/OpenDevice.cpp				\
+	src/Driver.cpp			            			\
+	src/BaseObject.cpp				\
 	src/SAFTd.cpp			src/SAFTd.h			\
 	src/RegisteredObject.cpp	src/RegisteredObject.h		\
 	src/eb-source.cpp		src/eb-source.h			\

@@ -811,8 +811,12 @@ void TimingReceiver::compile()
   used_conditions = id_space.size()/2;
 }
 
+// void TimingReceiver::firmwareDevice(const std::string &devicename,
+//                                     std::shared_ptr<Owned> 
+
 void TimingReceiver::probe(OpenDevice& od)
 {
+  std::cerr << "TimingReceiver::probe(od) called" << std::endl;
   std::vector<etherbone::sdb_msi_device> ecas, mbx_msi;
   od.device.sdb_find_by_identity_msi(ECA_SDB_VENDOR_ID, ECA_SDB_DEVICE_ID, ecas);
   od.device.sdb_find_by_identity_msi(MSI_MAILBOX_VENDOR, MSI_MAILBOX_PRODUCT, mbx_msi);
@@ -856,37 +860,37 @@ void TimingReceiver::probe(OpenDevice& od)
   // Add special SCU hardware
   if (scubus.size() == 1) {
 
-    // check if there is a Function Generator firmware running
-    try {
-      const std::string fg_fw_str("fg_firmware");
-      FunctionGeneratorFirmware::ConstructorType fg_fw_args = { od.objectPath + "/" + fg_fw_str, 
-                                                                tr.operator->(), // this is needed because passing a shared pointer to the children would prevent the destruction of the TimingReceiver object 
-                                                                tr->getDevice(),
-                                                                mbx_msi[0],
-                                                                mbx[0],
-                                                                tr->otherStuff["FunctionGenerator"],
-                                                                tr->otherStuff["MasterFunctionGenerator"]};
-      auto fg_firmware = FunctionGeneratorFirmware::create(fg_fw_args);
-      tr->otherStuff["FunctionGeneratorFirmware"][fg_fw_str] = fg_firmware;
+    // // check if there is a Function Generator firmware running
+    // try {
+    //   const std::string fg_fw_str("fg_firmware");
+    //   FunctionGeneratorFirmware::ConstructorType fg_fw_args = { od.objectPath + "/" + fg_fw_str, 
+    //                                                             tr.operator->(), // this is needed because passing a shared pointer to the children would prevent the destruction of the TimingReceiver object 
+    //                                                             tr->getDevice(),
+    //                                                             mbx_msi[0],
+    //                                                             mbx[0],
+    //                                                             tr->otherStuff["FunctionGenerator"],
+    //                                                             tr->otherStuff["MasterFunctionGenerator"]};
+    //   auto fg_firmware = FunctionGeneratorFirmware::create(fg_fw_args);
+    //   tr->otherStuff["FunctionGeneratorFirmware"][fg_fw_str] = fg_firmware;
 
-      clog << kLogDebug << "TimingReceiver: FunctionGenerator firmware found" << std::endl;
-    } catch (saftbus::Error &e) {
-      // send log message if firmware was not found ?
-      //clog << kLogDebug << "TimingReceiver: no FunctionGenerator firmware found" << std::endl;
-    }
+    //   clog << kLogDebug << "TimingReceiver: FunctionGenerator firmware found" << std::endl;
+    // } catch (saftbus::Error &e) {
+    //   // send log message if firmware was not found ?
+    //   //clog << kLogDebug << "TimingReceiver: no FunctionGenerator firmware found" << std::endl;
+    // }
 
    
-    // check if there is WrMilGateway firmware running
-    try {
-      const std::string wrmilgw_str("wrmilgateway");
-      WrMilGateway::ConstructorType wrmil_args = { od.objectPath + "/" + wrmilgw_str, 
-                                                   tr->getDevice()};
-      tr->otherStuff["WrMilGateway"][wrmilgw_str] = WrMilGateway::create(wrmil_args);
-      clog << kLogDebug << "TimingReceiver: WR-MIL-Gateway firmware found" << std::endl;
-    } catch (saftbus::Error &e) {
-      // send log message if firmware was not found ?
-      //clog << kLogDebug << "TimingReceiver: no WR-MIL-Gateway firmware found" << std::endl;
-    }
+    // // check if there is WrMilGateway firmware running
+    // try {
+    //   const std::string wrmilgw_str("wrmilgateway");
+    //   WrMilGateway::ConstructorType wrmil_args = { od.objectPath + "/" + wrmilgw_str, 
+    //                                                tr->getDevice()};
+    //   tr->otherStuff["WrMilGateway"][wrmilgw_str] = WrMilGateway::create(wrmil_args);
+    //   clog << kLogDebug << "TimingReceiver: WR-MIL-Gateway firmware found" << std::endl;
+    // } catch (saftbus::Error &e) {
+    //   // send log message if firmware was not found ?
+    //   //clog << kLogDebug << "TimingReceiver: no WR-MIL-Gateway firmware found" << std::endl;
+    // }
 
 
   }

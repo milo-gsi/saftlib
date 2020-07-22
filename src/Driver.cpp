@@ -30,6 +30,7 @@ static DriverBase *top = 0;
 
 void DriverBase::insert_self()
 {
+	std::cerr << "DriverBase::insert_self()" << std::endl;
   next = top;
   top = this;
 }
@@ -43,8 +44,13 @@ void DriverBase::remove_self()
 
 void Drivers::probe(OpenDevice& od)
 {
-  for (DriverBase *i = top; i; i = i->next)
+  std::cerr << "Drivers::probe(od) called" << std::endl;
+  int n = 0;
+  for (DriverBase *i = top; i; i = i->next) {
+  	std::cerr << "   probe driver " << n++ << " ..." << std::endl;
     i->probe(od);
+    std::cerr << " done" << std::endl;
+  }
 }
 
 }

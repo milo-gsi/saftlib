@@ -52,6 +52,8 @@ extern "C" {
 		return true;
 	}
 
+	static saftlib::Driver<testplugin::Driver1> *driver1;
+
 	std::string interface_xml = "<node><interface name='de.gsi.saftlib.Condition'><property name='ID' type='t' access='readwrite'/><property name='Mask' type='t' access='readwrite'/><property name='Offset' type='x' access='readwrite'/><property name='AcceptLate' type='b' access='readwrite'/><property name='AcceptEarly' type='b' access='readwrite'/><property name='AcceptConflict' type='b' access='readwrite'/><property name='AcceptDelayed' type='b' access='readwrite'/><property name='Active' type='b' access='readwrite'/></interface>"
 "</node>";
 	saftbus::InterfaceVTable vtable(interface_xml,
@@ -62,10 +64,14 @@ extern "C" {
 	void initialize(const std::shared_ptr<Slib::MainContext> &context,
 		            saftbus::Connection *connection)
 	{
+
+		driver1 = new saftlib::Driver<testplugin::Driver1>();
+
+
 		std::cerr << "creating a Driver1 instance" << std::endl;
 		//context->iteration(false);
 		// the driver plugin can attach sources to the context here
-		instance = std::make_shared<testplugin::Driver1>(context);
+		//instance = std::make_shared<testplugin::Driver1>(context);
 
 		connection_ptr = connection;
 		id = connection->register_object(
@@ -76,9 +82,10 @@ extern "C" {
 
 	void cleanup()
 	{
+		delete driver1;
 		connection_ptr->unregister_object(id);
 		std::cerr << "destroying a Driver1 instance" << std::endl;
-		instance.reset();
+		//instance.reset();
 	}
 
 
