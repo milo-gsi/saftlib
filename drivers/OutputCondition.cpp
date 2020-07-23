@@ -25,6 +25,7 @@
 #include "RegisteredObject.h"
 #include "OutputCondition.h"
 #include "ActionSink.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -57,7 +58,7 @@ void OutputCondition::setOn(bool v)
 
 std::shared_ptr<OutputCondition> OutputCondition::create(const ConstructorType& args)
 {
-  return RegisteredObject<OutputCondition>::create(args.objectPath, args);
+  return RegisteredObject<OutputCondition>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 }

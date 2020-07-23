@@ -26,6 +26,7 @@
 #include "WbmActionSink.h"
 #include "WbmCondition.h"
 #include "TimingReceiver.h"
+#include "SAFTd.h"
 
 #include "eca_ac_wbm_regs.h"
 #include <iomanip>
@@ -62,7 +63,7 @@ std::string WbmActionSink::NewCondition(bool active, uint64_t id, uint64_t mask,
 
 std::shared_ptr<WbmActionSink> WbmActionSink::create(const ConstructorType& args)
 {
-  return RegisteredObject<WbmActionSink>::create(args.objectPath, args);
+  return RegisteredObject<WbmActionSink>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 

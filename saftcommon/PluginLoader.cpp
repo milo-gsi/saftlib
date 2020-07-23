@@ -11,7 +11,7 @@ namespace saftbus {
 
 	PluginLoader::PluginLoader(const std::string &filename, 
 		                       const std::shared_ptr<Slib::MainContext> &context, 
-		                       saftbus::Connection *connection)
+		                       const std::shared_ptr<saftbus::Connection> &connection)
 		: handle_(nullptr)
 		, initialize_(nullptr)
 		, cleanup_(nullptr)

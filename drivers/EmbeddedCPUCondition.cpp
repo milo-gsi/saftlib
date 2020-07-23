@@ -22,6 +22,7 @@
 #include "RegisteredObject.h"
 #include "EmbeddedCPUCondition.h"
 #include "ActionSink.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -52,7 +53,7 @@ void EmbeddedCPUCondition::setTag(uint32_t val)
 
 std::shared_ptr<EmbeddedCPUCondition> EmbeddedCPUCondition::create(const ConstructorType& args)
 {
-  return RegisteredObject<EmbeddedCPUCondition>::create(args.objectPath, args);
+  return RegisteredObject<EmbeddedCPUCondition>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 }

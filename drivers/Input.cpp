@@ -25,12 +25,13 @@
 #include "Input.h"
 #include "RegisteredObject.h"
 #include "eca_tlu_regs.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
 std::shared_ptr<Input> Input::create(const ConstructorType& args)
 {
-  return RegisteredObject<Input>::create(args.objectPath, args);
+  return RegisteredObject<Input>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 Input::Input(const ConstructorType& args)

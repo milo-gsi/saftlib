@@ -21,6 +21,7 @@
 #define MASTER_FUNCTION_GENERATOR_H
 
 #include <deque>
+#include <etherbone.h>
 
 #include "interfaces/MasterFunctionGenerator.h"
 #include "FunctionGeneratorImpl.h"

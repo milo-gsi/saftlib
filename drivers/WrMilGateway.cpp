@@ -35,6 +35,7 @@
 #include "WrMilGateway.h"
 #include "wr_mil_gw_regs.h" 
 #include "clog.h"
+#include "SAFTd.h"
 
 #define LM32_RAM_USER_VENDOR      0x651       //vendor ID
 #define LM32_RAM_USER_PRODUCT     0x54111351  //product ID
@@ -235,7 +236,7 @@ void WrMilGateway::writeRegisterContent(uint32_t reg_offset, uint32_t value)
 
 std::shared_ptr<WrMilGateway> WrMilGateway::create(const ConstructorType& args)
 {
-  return RegisteredObject<WrMilGateway>::create(args.objectPath, args);
+  return RegisteredObject<WrMilGateway>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 std::vector< uint32_t > WrMilGateway::getRegisterContent() const

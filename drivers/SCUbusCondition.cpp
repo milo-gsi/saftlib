@@ -25,6 +25,7 @@
 #include "RegisteredObject.h"
 #include "SCUbusCondition.h"
 #include "ActionSink.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -55,7 +56,7 @@ void SCUbusCondition::setTag(uint32_t val)
 
 std::shared_ptr<SCUbusCondition> SCUbusCondition::create(const ConstructorType& args)
 {
-  return RegisteredObject<SCUbusCondition>::create(args.objectPath, args);
+  return RegisteredObject<SCUbusCondition>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 }

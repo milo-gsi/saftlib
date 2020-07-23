@@ -22,6 +22,7 @@
 
 #include <deque>
 #include <memory>
+#include <etherbone.h>
 
 namespace saftlib {
 

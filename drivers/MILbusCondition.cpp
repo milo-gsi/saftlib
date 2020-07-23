@@ -25,6 +25,7 @@
 #include "RegisteredObject.h"
 #include "MILbusCondition.h"
 #include "ActionSink.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -55,7 +56,7 @@ void MILbusCondition::setTag(uint16_t val)
 
 std::shared_ptr<MILbusCondition> MILbusCondition::create(const ConstructorType& args)
 {
-  return RegisteredObject<MILbusCondition>::create(args.objectPath, args);
+  return RegisteredObject<MILbusCondition>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 }

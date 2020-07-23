@@ -5,25 +5,32 @@
 #include <memory>
 
 
-#include "Super.h"
-#include <Driver.h>
-#include <OpenDevice.h>
+#include <FirmwareDriver.h>
+#include <Owned.h>
 
-extern saftlib::DriverBase *top;
 
-namespace testplugin
+namespace testplugin 
 {
-	class Driver1 : public Super
+
+	class Driver1_Service {
+
+	};
+
+	class Driver1 : public saftlib::Owned
 	{
 	public:
-		Driver1();
-		Driver1(const std::shared_ptr<Slib::MainContext> &context);
+	    struct ConstructorType {
+	      saftlib::Device device;
+	    };
+	    typedef Driver1_Service ServiceType;
+
+
+		Driver1(const std::string& objectPath);
 		~Driver1();
 		// saftbus method
 		bool SayHello();
-		static void probe(saftlib::OpenDevice& od);
+		static void probe(saftlib::FirmwareDevice& fd);
 	private:
-		sigc::connection con;
 	};
 
 }

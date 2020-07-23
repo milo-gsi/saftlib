@@ -790,7 +790,7 @@ bool Connection::dispatch(Slib::IOCondition condition, int client_fd)
 						std::cerr << "loading plugin " << so_filename << std::endl;
 						try {
 							// auto connection = std::shared_ptr<saftbus::Connection>(this);
-							_plugins[so_filename] = std::make_shared<saftbus::PluginLoader>(so_filename, Slib::MainContext::get_default(), this);
+							_plugins[so_filename] = std::make_shared<saftbus::PluginLoader>(so_filename, Slib::MainContext::get_default(), saftbus::connection);
 						} catch (std::runtime_error &e) {
 							std::cerr << "error loading plugin " << so_filename << ": " << e.what() << std::endl;
 						}

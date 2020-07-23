@@ -31,6 +31,7 @@
 #include "TimingReceiver.h"
 #include "fg_regs.h"
 #include "clog.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -108,7 +109,7 @@ void FunctionGenerator::on_fg_stopped(uint64_t time, bool abort, bool hardwareUn
 
 std::shared_ptr<FunctionGenerator> FunctionGenerator::create(const ConstructorType& args)
 {
-  return RegisteredObject<FunctionGenerator>::create(args.objectPath, args);
+  return RegisteredObject<FunctionGenerator>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 

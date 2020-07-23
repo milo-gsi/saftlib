@@ -31,6 +31,7 @@
 
 #include "RegisteredObject.h"
 #include "Driver.h"
+#include "FirmwareDriver.h"
 #include "TimingReceiver.h"
 #include "SCUbusActionSink.h"
 #include "WbmActionSink.h"
@@ -51,6 +52,7 @@
 #include "Output.h"
 #include "Input.h"
 #include "ats_regs.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -232,6 +234,7 @@ TimingReceiver::~TimingReceiver()
     // destroy children
     actionSinks.clear();
     eventSources.clear();
+    firmwareDevices.clear();
     otherStuff.clear();
     
     // wipe out the condition table
@@ -549,12 +552,18 @@ std::map< std::string, std::map< std::string, std::string > > TimingReceiver::ge
     out[i->second->getInterfaceName()][i->second->getObjectName()] = i->second->getObjectPath();
   }
   
+  typedef FirmwareDevices::const_iterator fw_driver;
+  for (fw_driver i = firmwareDevices.begin(); i != firmwareDevices.end(); ++i) {
+    out["FirmwareDevice"][i->first] = i->second->getObjectPath();
+  }
+
   typedef OtherStuff::const_iterator other;
   typedef Owneds::const_iterator owned;
   for (other i = otherStuff.begin(); i != otherStuff.end(); ++i)
     for (owned j = i->second.begin(); j != i->second.end(); ++j)
       out[i->first][j->first] = j->second->getObjectPath();
-  
+
+
   return out;
 }
 
@@ -854,30 +863,30 @@ void TimingReceiver::probe(OpenDevice& od)
     (eb_address_t)pps[0].sdb_component.addr_first,
     ats_addr,
   };
-  std::shared_ptr<TimingReceiver> tr = RegisteredObject<TimingReceiver>::create(od.objectPath, args);
+  std::shared_ptr<TimingReceiver> tr = RegisteredObject<TimingReceiver>::create(SAFTd::get().connection(), od.objectPath, args);
   od.ref = tr;
     
   // Add special SCU hardware
   if (scubus.size() == 1) {
 
-    // // check if there is a Function Generator firmware running
-    // try {
-    //   const std::string fg_fw_str("fg_firmware");
-    //   FunctionGeneratorFirmware::ConstructorType fg_fw_args = { od.objectPath + "/" + fg_fw_str, 
-    //                                                             tr.operator->(), // this is needed because passing a shared pointer to the children would prevent the destruction of the TimingReceiver object 
-    //                                                             tr->getDevice(),
-    //                                                             mbx_msi[0],
-    //                                                             mbx[0],
-    //                                                             tr->otherStuff["FunctionGenerator"],
-    //                                                             tr->otherStuff["MasterFunctionGenerator"]};
-    //   auto fg_firmware = FunctionGeneratorFirmware::create(fg_fw_args);
-    //   tr->otherStuff["FunctionGeneratorFirmware"][fg_fw_str] = fg_firmware;
+    // check if there is a Function Generator firmware running
+    try {
+      const std::string fg_fw_str("fg_firmware");
+      FunctionGeneratorFirmware::ConstructorType fg_fw_args = { od.objectPath + "/" + fg_fw_str, 
+                                                                tr.operator->(), // this is needed because passing a shared pointer to the children would prevent the destruction of the TimingReceiver object 
+                                                                tr->getDevice(),
+                                                                mbx_msi[0],
+                                                                mbx[0],
+                                                                tr->otherStuff["FunctionGenerator"],
+                                                                tr->otherStuff["MasterFunctionGenerator"]};
+      auto fg_firmware = FunctionGeneratorFirmware::create(fg_fw_args);
+      tr->otherStuff["FunctionGeneratorFirmware"][fg_fw_str] = fg_firmware;
 
-    //   clog << kLogDebug << "TimingReceiver: FunctionGenerator firmware found" << std::endl;
-    // } catch (saftbus::Error &e) {
-    //   // send log message if firmware was not found ?
-    //   //clog << kLogDebug << "TimingReceiver: no FunctionGenerator firmware found" << std::endl;
-    // }
+      clog << kLogDebug << "TimingReceiver: FunctionGenerator firmware found" << std::endl;
+    } catch (saftbus::Error &e) {
+      // send log message if firmware was not found ?
+      //clog << kLogDebug << "TimingReceiver: no FunctionGenerator firmware found" << std::endl;
+    }
 
    
     // // check if there is WrMilGateway firmware running
@@ -894,6 +903,26 @@ void TimingReceiver::probe(OpenDevice& od)
 
 
   }
+}
+
+void TimingReceiver::WriteFirmware(const std::vector< unsigned char >& firmware_bin, unsigned char cpuindex)
+{
+}
+
+void TimingReceiver::AttachFirmwareDriver(const std::string& name)
+{
+  FirmwareDevice fd(getDevice());
+  fd.connection = SAFTd::get().connection();
+  fd.name = name;
+  fd.objectPath = getObjectPath() + "/" + name;
+  FirmwareDrivers::probe(fd);
+  if (fd.ref) {
+    std::cerr << "found FrimwareDriver !!!" << std::endl;
+    firmwareDevices.insert(std::make_pair(name, fd.ref));
+  }
+
+  std::cerr << "connection pointer as seen from timingReceiver: " << SAFTd::get().connection().get() << std::endl;
+
 }
 
 static Driver<TimingReceiver> timingReceiver;

@@ -20,6 +20,7 @@
 #ifndef CONDITION_H
 #define CONDITION_H
 
+#include <etherbone.h>
 #include "interfaces/iCondition.h"
 #include "Owned.h"
 

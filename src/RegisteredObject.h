@@ -20,8 +20,13 @@
 #ifndef SAFTLIB_REGISTERED_OBJECT_H
 #define SAFTLIB_REGISTERED_OBJECT_H
 
-#include <etherbone.h>
-#include "SAFTd.h"
+#include <sstream>
+#include <memory>
+
+// this dependence is deprecated: saftlib should not depend on etherbone in the long run!
+// #include <etherbone.h>
+
+#include <saftbus.h>
 
 namespace saftlib {
 
@@ -32,29 +37,29 @@ template <typename T>
 class RegisteredObject : public T
 {
   public:
-    static std::shared_ptr< RegisteredObject<T> > create(const std::string& object_path, const typename T::ConstructorType& args);
+    static std::shared_ptr< RegisteredObject<T> > create(const std::shared_ptr<saftbus::Connection> &connection, const std::string& object_path, const typename T::ConstructorType& args);
     
     const std::shared_ptr<saftbus::Connection>& getConnection() const;
     const std::string& getSender() const;
     
   protected:
-    RegisteredObject(const std::string& object_path, const typename T::ConstructorType& args);
+    RegisteredObject(const std::shared_ptr<saftbus::Connection> &connection, const std::string& object_path, const typename T::ConstructorType& args);
     virtual void rethrow(const char *method) const;
     
     typename T::ServiceType service;
 };
 
 template <typename T>
-std::shared_ptr< RegisteredObject<T> > RegisteredObject<T>::create(const std::string& object_path, const typename T::ConstructorType& args)
+std::shared_ptr< RegisteredObject<T> > RegisteredObject<T>::create(const std::shared_ptr<saftbus::Connection> &connection, const std::string& object_path, const typename T::ConstructorType& args)
 {
-  return std::shared_ptr< RegisteredObject<T> >(new RegisteredObject<T>(object_path, args));
+  return std::shared_ptr< RegisteredObject<T> >(new RegisteredObject<T>(connection, object_path, args));
 }
 
 template <typename T>
-RegisteredObject<T>::RegisteredObject(const std::string& object_path, const typename T::ConstructorType& args)
+RegisteredObject<T>::RegisteredObject(const std::shared_ptr<saftbus::Connection> &connection, const std::string& object_path, const typename T::ConstructorType& args)
  : T(args), service(this, sigc::mem_fun(this, &RegisteredObject<T>::rethrow))
 {
-  service.register_self(SAFTd::get().connection(), object_path);
+  service.register_self(connection, object_path);
 }
 
 template <typename T>
@@ -74,9 +79,13 @@ void RegisteredObject<T>::rethrow(const char *method) const
 {
   try {
     throw;
-  } catch (const etherbone::exception_t& e) {
+  } catch (std::runtime_error &e) {
     std::ostringstream str;
-    str << method << ": " << e;
+    str << method << ": " << e.what();
+    throw saftbus::Error(saftbus::Error::IO_ERROR, str.str().c_str());
+  } catch (...) {
+    std::ostringstream str;
+    str << method << ": unknown exception";
     throw saftbus::Error(saftbus::Error::IO_ERROR, str.str().c_str());
   }
 }

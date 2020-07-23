@@ -30,6 +30,7 @@
 #include "eca_queue_regs.h"
 #include "eca_flags.h"
 #include "src/clog.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -40,7 +41,7 @@ SoftwareActionSink::SoftwareActionSink(const ConstructorType& args)
 
 std::shared_ptr<SoftwareActionSink> SoftwareActionSink::create(const ConstructorType& args)
 {
-  return RegisteredObject<SoftwareActionSink>::create(args.objectPath, args);
+  return RegisteredObject<SoftwareActionSink>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 const char *SoftwareActionSink::getInterfaceName() const

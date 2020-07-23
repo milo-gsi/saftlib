@@ -31,6 +31,7 @@
 #include "TimingReceiver.h"
 #include "fg_regs.h"
 #include "clog.h"
+#include "SAFTd.h"
 
 
 
@@ -151,7 +152,7 @@ void MasterFunctionGenerator::on_fg_stopped(std::shared_ptr<FunctionGeneratorImp
 
 std::shared_ptr<MasterFunctionGenerator> MasterFunctionGenerator::create(const ConstructorType& args)
 {
-  return RegisteredObject<MasterFunctionGenerator>::create(args.objectPath, args);
+  return RegisteredObject<MasterFunctionGenerator>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 void MasterFunctionGenerator::InitializeSharedMemory(const std::string& shared_memory_name)

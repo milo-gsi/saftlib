@@ -26,6 +26,7 @@
 #include "SCUbusActionSink.h"
 #include "SCUbusCondition.h"
 #include "TimingReceiver.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -59,7 +60,7 @@ void SCUbusActionSink::InjectTag(uint32_t tag)
 
 std::shared_ptr<SCUbusActionSink> SCUbusActionSink::create(const ConstructorType& args)
 {
-  return RegisteredObject<SCUbusActionSink>::create(args.objectPath, args);
+  return RegisteredObject<SCUbusActionSink>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 }

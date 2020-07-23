@@ -25,12 +25,13 @@
 #include "Output.h"
 #include "OutputCondition.h"
 #include "RegisteredObject.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
 std::shared_ptr<Output> Output::create(const ConstructorType& args)
 {
-  return RegisteredObject<Output>::create(args.objectPath, args);
+  return RegisteredObject<Output>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 Output::Output(const ConstructorType& args) :

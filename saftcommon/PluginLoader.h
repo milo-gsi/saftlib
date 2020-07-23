@@ -18,7 +18,7 @@ namespace saftbus
 
 	typedef std::vector<std::string> get_interface_names_t();
 	typedef void                     initialize_t(const std::shared_ptr<Slib::MainContext> &loop, 
-		                                          saftbus::Connection *connection);
+		                                          const std::shared_ptr<saftbus::Connection> &connection);
 	typedef void                     cleanup_t();
 
 
@@ -29,7 +29,7 @@ namespace saftbus
 		public:
 			PluginLoader(const std::string &filename, 
 				         const std::shared_ptr<Slib::MainContext> &context, 
-				         saftbus::Connection *connection);
+				         const std::shared_ptr<saftbus::Connection> &connection);
 			~PluginLoader();
 
 		private:

@@ -20,7 +20,7 @@
 #ifndef OWNED_H
 #define OWNED_H
 
-#include "interfaces/iOwned.h"
+#include "iOwned.h"
 #include "BaseObject.h"
 
 namespace saftlib {

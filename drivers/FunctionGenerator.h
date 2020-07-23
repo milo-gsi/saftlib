@@ -32,6 +32,7 @@
 #include <deque>
 
 
+#include <etherbone.h>
 #include "interfaces/FunctionGenerator.h"
 #include "FunctionGeneratorImpl.h"
 #include "Owned.h"

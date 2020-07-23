@@ -30,11 +30,13 @@
 #define FUNCTION_GENERATOR_FIRMWARE_H
 
 #include <deque>
+#include <etherbone.h>
 
 #include "interfaces/FunctionGeneratorFirmware.h"
 #include "FunctionGenerator.h"
 #include "MasterFunctionGenerator.h"
 #include "Owned.h"
+#include "Device.h"
 
 namespace saftlib {
 

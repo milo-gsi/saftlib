@@ -22,20 +22,40 @@
 #define __STDC_FORMAT_MACROS
 #define __STDC_CONSTANT_MACROS
 
-#include "RegisteredObject.h"
-#include "SoftwareCondition.h"
-#include "SAFTd.h"
+#include "FirmwareDriver.h"
+#include <iostream>
 
 namespace saftlib {
 
-SoftwareCondition::SoftwareCondition(const ConstructorType& args)
- : Condition(args)
-{
+static FirmwareDriverBase *top = 0;
+
+FirmwareDevice::FirmwareDevice(Device &dev) : device(dev) {
 }
 
-std::shared_ptr<SoftwareCondition> SoftwareCondition::create(const ConstructorType& args)
+
+void FirmwareDriverBase::insert_self()
 {
-  return RegisteredObject<SoftwareCondition>::create(SAFTd::get().connection(), args.objectPath, args);
+	std::cerr << "FirmwareDriverBase::insert_self()" << std::endl;
+  next = top;
+  top = this;
+}
+
+void FirmwareDriverBase::remove_self()
+{
+  FirmwareDriverBase **i;
+  for (i = &top; *i != this; i = &(*i)->next) { }
+  *i = next;
+}
+
+void FirmwareDrivers::probe(FirmwareDevice& fd)
+{
+  std::cerr << "FirmwareDrivers::probe(fd) called" << std::endl;
+  int n = 0;
+  for (FirmwareDriverBase *i = top; i; i = i->next) {
+  	std::cerr << "   probe Firmwaredriver " << n++ << " ..." << std::endl;
+    i->probe(fd);
+    std::cerr << "    ... done" << std::endl;
+  }
 }
 
 }

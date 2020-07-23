@@ -25,6 +25,7 @@
 #include "RegisteredObject.h"
 #include "WbmCondition.h"
 #include "ActionSink.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -55,7 +56,7 @@ WbmCondition::WbmCondition(const ConstructorType& args)
 
 std::shared_ptr<WbmCondition> WbmCondition::create(const ConstructorType& args)
 {
-  return RegisteredObject<WbmCondition>::create(args.objectPath, args);
+  return RegisteredObject<WbmCondition>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 }

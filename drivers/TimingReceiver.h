@@ -20,11 +20,13 @@
 #ifndef TIMING_RECEIVER_H
 #define TIMING_RECEIVER_H
 
+#include <memory>
+#include <etherbone.h>
+
 #include "OpenDevice.h"
 #include "ActionSink.h"
 #include "EventSource.h"
 #include "interfaces/TimingReceiver.h"
-#include <memory>
 
 namespace saftlib {
 
@@ -77,12 +79,17 @@ class TimingReceiver : public BaseObject, public iTimingReceiver, public iDevice
     Device& getDevice() { return device; }
     eb_address_t getBase() { return base; }
     uint64_t ReadRawCurrentTime();
+
+    void WriteFirmware(const std::vector< unsigned char >& firmware_bin, unsigned char cpuindex);
+    void AttachFirmwareDriver(const std::string& name);
+
     
     // public type, even though the member is private
     typedef std::pair<unsigned, unsigned> SinkKey; // (channel, num)
     typedef std::map< SinkKey, std::shared_ptr<ActionSink> >  ActionSinks;
     typedef std::map< SinkKey, std::shared_ptr<EventSource> > EventSources;
-    
+
+
   protected:
     mutable saftlib::Device device;
     std::string name;
@@ -110,13 +117,22 @@ class TimingReceiver : public BaseObject, public iTimingReceiver, public iDevice
     std::vector<eb_address_t> channel_msis;
     std::vector<eb_address_t> queue_addresses;
     std::vector<uint16_t> most_full;
-        
+    
+    // deprecated... OtherStuff is a stupid name anyways    
     typedef std::map< std::string, std::shared_ptr<Owned> > Owneds;
     typedef std::map< std::string, Owneds >              OtherStuff;
+
+    typedef std::map< std::string, std::shared_ptr<Owned> > FirmwareDevices;
     
-    ActionSinks  actionSinks;
-    EventSources eventSources;
+    ActionSinks     actionSinks;
+    EventSources    eventSources;
+    FirmwareDevices firmwareDevices;
+    // deprecated... OtherStuff is a stupid name anyways    
     OtherStuff   otherStuff;
+
+
+
+
     
     // Polling method
     bool poll();

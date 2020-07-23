@@ -11,25 +11,28 @@ pkg_DATA = saftlib.pc
 EXTRA_DIST = saftlib.pc.in
 
 ACLOCAL_AMFLAGS = -I m4
-AM_CPPFLAGS = $(EB_CFLAGS) $(SIGCPP_CFLAGS) -I $(top_srcdir)/src -I $(top_builddir) -I $(top_builddir)/saftbus -I $(top_builddir)/saftcommon
+AM_CPPFLAGS = $(EB_CFLAGS) $(SIGCPP_CFLAGS) -I $(top_srcdir)/src -I $(top_builddir) -I $(top_builddir)/saftcommon -I $(top_builddir)/drivers -I $(top_builddir)/interfaces
 
 BUILT_SOURCES = version.h
 .PHONY: version.h debian # causes build.cpp to be rebuilt every run
 
 saftddir = $(includedir)/saftlib
 saftd_HEADERS = src/Driver.h \
+                src/FirmwareDriver.h \
                 src/OpenDevice.h \
                 src/BaseObject.h \
-                src/Device.h 
-
+                src/Device.h \
+                drivers/Owned.h	\
+                src/RegisteredObject.h
 
 saftd_SOURCES = version.h \
-	src/Device.cpp						\
+	src/Device.cpp					\
 	src/OpenDevice.cpp				\
-	src/Driver.cpp			            			\
+	src/Driver.cpp					\
+	src/FirmwareDriver.cpp			\
 	src/BaseObject.cpp				\
 	src/SAFTd.cpp			src/SAFTd.h			\
-	src/RegisteredObject.cpp	src/RegisteredObject.h		\
+	src/RegisteredObject.cpp			\
 	src/eb-source.cpp		src/eb-source.h			\
 	src/clog.cpp			src/clog.h			\
 	src/build.cpp			src/build.h			\
@@ -39,7 +42,7 @@ saftd_SOURCES = version.h \
 	drivers/eca_queue_regs.h	drivers/eca_tlu_regs.h		\
 	drivers/io_control_regs.h	drivers/fg_regs.h		\
 	drivers/ats_regs.h      drivers/wr_mil_gw_regs.h    \
-	drivers/Owned.cpp		drivers/Owned.h			\
+	drivers/Owned.cpp				\
 	drivers/Condition.cpp		drivers/Condition.h		\
 	drivers/SoftwareCondition.cpp	drivers/SoftwareCondition.h	\
 	drivers/OutputCondition.cpp	drivers/OutputCondition.h	\

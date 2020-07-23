@@ -20,6 +20,8 @@
 #ifndef OUTPUT_H
 #define OUTPUT_H
 
+#include <etherbone.h>
+
 #include "InoutImpl.h"
 #include "ActionSink.h"
 #include "interfaces/Output.h"

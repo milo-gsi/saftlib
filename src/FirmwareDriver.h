@@ -17,28 +17,61 @@
  *  License along with this library. If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************
  */
-#ifndef EVENTSOURCE_H
-#define EVENTSOURCE_H
+#ifndef SAFTLIB_FIRMWAREDRIVER_H
+#define SAFTLIB_FIRMWAREDRIVER_H
 
-#include <etherbone.h>
+#include <memory>
+#include <string>
+#include "Device.h"
 #include "Owned.h"
-#include "interfaces/iEventSource.h"
 
 namespace saftlib {
 
-class TimingReceiver;
+struct FirmwareDevice {
+  Device &device;
+  std::shared_ptr<saftbus::Connection> connection;
+  std::string name;
+  std::string objectPath;
+  std::shared_ptr<Owned> ref;
+  FirmwareDevice(Device &dev);
+};
 
-class EventSource : public Owned, public iEventSource {
+
+class FirmwareDriverBase
+{
   public:
-    EventSource(const std::string& objectPath, TimingReceiver* dev, const std::string& name, sigc::slot<void> destroy = sigc::slot<void>());
+    FirmwareDriverBase() { }
+    void insert_self();
+    void remove_self();
     
-    // The name under which this EventSource is listed in TimingReceiver::Iterfaces
-    virtual const char *getInterfaceName() const = 0;
-    const std::string &getObjectName() const { return name; }
-  
   protected:
-    TimingReceiver* dev;
-    std::string name;
+    virtual void probe(FirmwareDevice& fd) = 0;
+    
+  private:
+    FirmwareDriverBase *next;
+    
+    // non-copyable
+    FirmwareDriverBase(const FirmwareDriverBase&);
+    FirmwareDriverBase& operator = (const FirmwareDriverBase&);
+  
+  friend class FirmwareDrivers;
+};
+
+template <typename T>
+class FirmwareDriver : private FirmwareDriverBase
+{
+  public:
+    FirmwareDriver() { insert_self(); }
+    ~FirmwareDriver() { remove_self(); }
+  
+  private:
+    void probe(FirmwareDevice& fd) { return T::probe(fd); }
+};
+
+class FirmwareDrivers
+{
+  public:
+    static void probe(FirmwareDevice& fd);
 };
 
 }

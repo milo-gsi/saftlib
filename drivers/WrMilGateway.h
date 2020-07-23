@@ -30,6 +30,7 @@
 #define WR_MIL_GATEWAY_H_
 
 #include <deque>
+#include <etherbone.h>
 
 #include "interfaces/WrMilGateway.h"
 #include "Owned.h"

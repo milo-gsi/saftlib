@@ -20,6 +20,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include <etherbone.h>
+
 #include "InoutImpl.h"
 #include "EventSource.h"
 #include "interfaces/Input.h"

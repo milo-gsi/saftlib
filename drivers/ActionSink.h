@@ -21,6 +21,7 @@
 #define ACTION_SINK_H
 
 #include <map>
+#include <etherbone.h>
 #include "interfaces/iActionSink.h"
 #include "Condition.h"
 

@@ -172,5 +172,27 @@
          The ECA has limited hardware resources in its match table.
       -->
     <property name="Free" type="u" access="read"/>
+
+
+    <!-- WriteFirmware: Write the firmware binary into the instruction memory of cpu[cpuindex].
+
+         @firmware_bin: Binary data of the compiled firmware.
+         @cpuindex:     Specifies which of the CPUs shold get the new firmware.
+      -->
+    <method name="WriteFirmware">
+      <arg direction="in" type="ay" name="firmware_bin"/>
+      <arg direction="in" type="y"  name="cpuindex"/>
+    </method>
+
+    <!-- AttachFirmwareDriver: Attach a Device that interacts with the firmware of one of the lm32.
+
+         @name: The logical name of the FirmwareDevice.
+
+         The device driver is responsible for finding its CPU(s) (e.g. by scanning for magic words in shared memory section).
+      -->
+    <method name="AttachFirmwareDriver">
+      <arg direction="in" type="s" name="name"/>
+    </method>
+
   </interface>  
 </node>

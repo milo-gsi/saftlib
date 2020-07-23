@@ -34,6 +34,7 @@
 #include "TimingReceiver.h"
 #include "fg_regs.h"
 #include "clog.h"
+#include "SAFTd.h"
 
 namespace saftlib {
 
@@ -102,7 +103,7 @@ FunctionGeneratorFirmware::~FunctionGeneratorFirmware()
 
 std::shared_ptr<FunctionGeneratorFirmware> FunctionGeneratorFirmware::create(const ConstructorType& args)
 {
-  return RegisteredObject<FunctionGeneratorFirmware>::create(args.objectPath, args);
+  return RegisteredObject<FunctionGeneratorFirmware>::create(SAFTd::get().connection(), args.objectPath, args);
 }
 
 uint32_t FunctionGeneratorFirmware::getVersion() const
