@@ -14,6 +14,8 @@ namespace saftlib {
 	void EB_Forward::open_pts() 
 	{
 		_pts_fd = open("/dev/ptmx", O_RDWR);
+		std::cerr << "freshly opened _pts_fd="  << _pts_fd << std::endl;
+		std::cerr << "ptsname(_pts_fd)" << ptsname(_pts_fd) << std::endl;
 		grantpt(_pts_fd);
 		unlockpt(_pts_fd);
 		chmod(ptsname(_pts_fd), S_IRUSR | S_IWUSR | 
@@ -23,12 +25,24 @@ namespace saftlib {
 		Slib::signal_io().connect(sigc::mem_fun(*this, &EB_Forward::accept_connection), _pts_fd, Slib::IO_IN | Slib::IO_HUP, Slib::PRIORITY_LOW);
 	}
 
-	EB_Forward::EB_Forward(const std::string & eb_name)
-	{
-		_eb_device_fd = open(eb_name.c_str(), O_RDWR);
-		if (_eb_device_fd == -1) {
-			return;
+	EB_Forward::EB_Forward(const std::string& eb_name)
+	{	
+		if (eb_name.size()) {
+			if (eb_name[0] == '/') {
+				std::cerr << "open " << eb_name << std::endl;
+				_eb_device_fd = open(eb_name.c_str(), O_RDWR);
+			} else {
+				std::string name = "/";
+				name.append(eb_name);
+				std::cerr << "open " << name << std::endl;
+				_eb_device_fd = open(name.c_str(), O_RDWR);
+			}
+			if (_eb_device_fd > 0) {
+				open_pts();
+				return;
+			}
 		}
+		std::cerr << "failed to open " << eb_name << std::endl;
 		open_pts();
 	} 
 	EB_Forward::~EB_Forward()
@@ -154,6 +168,9 @@ namespace saftlib {
 
 	std::string EB_Forward::saft_eb_devide()
 	{
+		std::cerr << "_pts_fd=" << _pts_fd << std::endl;
+		std::cerr << "ptsname(_pts_fd)=" << ptsname(_pts_fd) << std::endl;
+		std::cerr << std::string(ptsname(_pts_fd)) << std::endl;
 		return std::string(ptsname(_pts_fd));
 	}
 
