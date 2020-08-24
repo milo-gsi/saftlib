@@ -72,6 +72,14 @@
     <method name="RemoveDevice">
       <arg direction="in" type="s" name="name"/>
     </method>
+
+
+    <method name="LoadPlugin">
+      <arg direction="in" type="s" name="so_filename"/>
+    </method>
+    <method name="RemovePlugin">
+      <arg direction="in" type="s" name="so_filename"/>
+    </method>
     
     <!-- Quit: Instructs the saftlib daemon to quit.
          Be absolutely certain before calling this method!

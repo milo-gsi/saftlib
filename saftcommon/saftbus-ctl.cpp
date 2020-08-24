@@ -53,8 +53,6 @@ static void show_help(const char *argv0)
 	std::cout << "   --enable-signal-timing-stats       " << std::endl;
 	std::cout << "   --disable-signal-timing-stats      " << std::endl;
 	std::cout << "   --download-signal-timing-stats     " << std::endl;
-	std::cout << "   --plugin <so-filename>             " << std::endl;
-	std::cout << "   --plugout <so-filename>            " << std::endl;
 }
 
 static std::string print_saftbus_object_table(std::shared_ptr<saftbus::ProxyConnection> connection) 
@@ -480,8 +478,6 @@ int main(int argc, char *argv[])
 		bool introspect                   = false;
 		bool get_properties               = false;
 		bool list_methods                 = false;
-		bool load_plugin                  = false;
-		bool remove_plugin                = false;
 
 		std::string interface_name;
 		std::string object_path;
@@ -491,8 +487,6 @@ int main(int argc, char *argv[])
 		std::string property_value;
 		std::string method_name;
 		std::vector<std::string> method_arguments;
-
-		std::string plugin_name;
 
 		std::string timing_stats_filename = "saftbus_timing.dat";
 
@@ -582,20 +576,6 @@ int main(int argc, char *argv[])
 					interface_name          = argv[++i];
 					object_path             = argv[++i];
 				}
-			} else if (argvi == "--plugin") {
-				if (argc - i <= 1) {
-					std::cerr << "expect 1 argument after --plugin: libraryname" << std::endl;
-				} else {
-					load_plugin = true;
-					plugin_name = argv[++i];
-				}
-			} else if (argvi == "--plugout") {
-				if (argc - i <= 1) {
-					std::cerr << "expect 1 argument after --plugout: libraryname" << std::endl;
-				} else {
-					remove_plugin = true;
-					plugin_name = argv[++i];
-				}
 			} else {
 				std::cerr << "unknown argument: " << argvi << std::endl;
 				return 1;
@@ -671,15 +651,6 @@ int main(int argc, char *argv[])
 			} catch(saftbus::Error &e) {
 				std::cerr << "exepction retured from introspection: " << e.what() << std::endl;
 			}
-		}
-
-		if (load_plugin) {
-			saftbus::write(connection->get_fd(), saftbus::SAFTBUS_LOAD_PLUGIN);
-			saftbus::write(connection->get_fd(), plugin_name);
-		}
-		if (remove_plugin) {
-			saftbus::write(connection->get_fd(), saftbus::SAFTBUS_REMOVE_PLUGIN);
-			saftbus::write(connection->get_fd(), plugin_name);
 		}
 
 		if (interactive_mode) {

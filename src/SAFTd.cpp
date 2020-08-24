@@ -143,7 +143,7 @@ std::string SAFTd::AttachDevice(const std::string& name, const std::string& path
       std::string path_prefix = path.substr(0,7);
       if (path_prefix == "dev/tty") {
         poll_msis = true;
-        //std::cerr << "polling msi enabled" << std::endl;
+        std::cerr << "polling msi enabled" << std::endl;
       }
       struct OpenDevice od(edev, first, last, poll_msis);
       od.name = name;
@@ -210,5 +210,32 @@ std::string SAFTd::getBuildInfo() const
 {
   return buildInfo;
 }
+
+
+void SAFTd::LoadPlugin(const std::string &so_filename) 
+{
+  std::cerr << "saftbus plugin request" << so_filename << std::endl;
+  if (m_plugins.find(so_filename) == m_plugins.end()) {
+    std::cerr << "loading plugin " << so_filename << std::endl;
+    try {
+      m_plugins[so_filename] = std::make_shared<saftbus::PluginLoader>(so_filename, m_loop->get_context(), m_connection);
+    } catch (std::runtime_error &e) {
+      std::cerr << "error loading plugin " << so_filename << ": " << e.what() << std::endl;
+    }
+  }
+}
+
+void SAFTd::RemovePlugin(const std::string &so_filename)
+{
+  std::cerr << "saftbus plugin remove request" << so_filename << std::endl;
+  if (m_plugins.find(so_filename) != m_plugins.end()) {
+    std::cerr << "removing plugin " << so_filename << std::endl;
+    try {
+      m_plugins.erase(so_filename);
+    } catch (std::runtime_error &e) {
+      std::cerr << "error removing plugin " << so_filename << ": " << e.what() << std::endl;
+    }
+  }
+} 
 
 } // saftlib

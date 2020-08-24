@@ -33,7 +33,6 @@
 #include "Logger.h"
 #include "PollFD.h"
 #include "core.h"
-#include "PluginLoader.h"
 
 
 namespace saftbus
@@ -102,14 +101,10 @@ namespace saftbus
 
 		std::set<int> _sockets;
 
-		std::map<std::string, std::shared_ptr<saftbus::PluginLoader > > _plugins;
-
-
 		// 	     // handle    // signal
 		std::map<unsigned, sigc::signal<void, const std::shared_ptr<Connection>&, const std::string&, const std::string&, const std::string&, const std::string&, const Serial&> > _handle_to_signal_map;
 		std::map<std::string, std::set<unsigned> > _id_handles_map;
 		std::set<unsigned> _erased_handles;
-
 
 		// store the pipes that go directly to one or many Proxy objects
 				// interface_name        // object path
