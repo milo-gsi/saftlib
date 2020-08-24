@@ -81,8 +81,8 @@ TimingReceiver::TimingReceiver(const ConstructorType& args)
   if (((retry ^ watchdog_value) >> 16) != 0)
     throw saftbus::Error(saftbus::Error::INVALID_ARGS, "Timing Receiver already locked");
   
-  // parse eb-info data
-  setupGatewareInfo(args.info);
+  // parse eb-info data later (on demand). for now just remember the address
+  info_addr = args.info;
   
   // update locked status
   getLocked();
@@ -292,7 +292,7 @@ std::string TimingReceiver::getName() const
 #endif
 #define WR_PPS_GEN_ESCR         0x1c      //External Sync Control Register
 
-void TimingReceiver::setupGatewareInfo(uint32_t address)
+void TimingReceiver::setupGatewareInfo(uint32_t address) const
 {
   eb_data_t buffer[256];
   
@@ -332,6 +332,10 @@ void TimingReceiver::setupGatewareInfo(uint32_t address)
 
 std::map< std::string, std::string > TimingReceiver::getGatewareInfo() const
 {
+  if (info_addr) {
+    setupGatewareInfo(info_addr);
+    info_addr = 0;
+  }
   return info;
 }
 
@@ -697,6 +701,7 @@ struct WalkEntry {
 
 void TimingReceiver::compile()
 {
+  std::cerr << "TimingReceiver::compile()" << std::endl;
   // Store all active conditions into a vector for processing
   typedef std::vector<ECA_OpenClose> ID_Space;
   ID_Space id_space;
@@ -820,18 +825,13 @@ void TimingReceiver::compile()
   used_conditions = id_space.size()/2;
 }
 
-// void TimingReceiver::firmwareDevice(const std::string &devicename,
-//                                     std::shared_ptr<Owned> 
-
 void TimingReceiver::probe(OpenDevice& od)
 {
-  std::cerr << "TimingReceiver::probe(od) called" << std::endl;
   std::vector<etherbone::sdb_msi_device> ecas, mbx_msi;
   od.device.sdb_find_by_identity_msi(ECA_SDB_VENDOR_ID, ECA_SDB_DEVICE_ID, ecas);
   od.device.sdb_find_by_identity_msi(MSI_MAILBOX_VENDOR, MSI_MAILBOX_PRODUCT, mbx_msi);
   
   std::vector<sdb_device> streams, infos, watchdogs, scubus, pps, mbx, ats;
-
   eb_address_t ats_addr = 0; // not every Altera FPGA model has a temperature sensor, i.e, Altera II
 
   od.device.sdb_find_by_identity(ECA_SDB_VENDOR_ID, 0x8752bf45, streams);

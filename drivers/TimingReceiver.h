@@ -103,7 +103,10 @@ class TimingReceiver : public BaseObject, public iTimingReceiver, public iDevice
     eb_address_t arrival_irq;
     eb_address_t generator_irq;
     
-    std::map<std::string, std::string> info;
+    // the following two members are mutable to implement lazy reading of gateware info
+    mutable eb_address_t info_addr;
+    mutable std::map<std::string, std::string> info;
+
     mutable bool locked;
     mutable int32_t temperature;
     eb_data_t watchdog_value;
@@ -137,7 +140,7 @@ class TimingReceiver : public BaseObject, public iTimingReceiver, public iDevice
     // Polling method
     bool poll();
     
-    void setupGatewareInfo(uint32_t address);
+    void setupGatewareInfo(uint32_t address) const;
     void do_remove(SinkKey key);
     void setHandler(unsigned channel, bool enable, eb_address_t address);
     void msiHandler(eb_data_t msi, unsigned channel);
