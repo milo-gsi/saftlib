@@ -111,7 +111,7 @@ doc_DATA = 			\
 	Types.pdf
 
 Types.pdf: Types.texi
-	$(TEXI2PDF) Types.texi; rm Types.aux Types.log Types.toc
+	$(TEXI2PDF) Types.texi; rm -f Types.aux Types.log Types.toc
 endif
 
 libsaftlib_la_LIBADD = $(SIGCPP_LIBS)
@@ -175,7 +175,9 @@ $(doc_DATA:.pdf=.doc-xml) $(nodist_libsaftlib_la_SOURCES) $(nodist_saftlib_HEADE
 	$(GDBUS_CODEGEN) --generate-docbook=docfoo --interface-prefix=de.gsi.saftlib $<
 	$(XSLTPROC) --path $(srcdir) fix-docbook.xsl docfoo-de.gsi.saftlib.$*.xml > docfoo-fix.$*.xml
 	$(DOCBOOK2TEXI) --string-param output-file=docfoo-fix.$* docfoo-fix.$*.xml
+	bash docfoo-fix-fix.sh
 	$(TEXI2PDF) docfoo-fix.$*.texi	
 	mv docfoo-*.$*.pdf $@
 	rm -f docfoo-de.gsi.saftlib.$*.xml docfoo-fix.$*.* 
+
 
